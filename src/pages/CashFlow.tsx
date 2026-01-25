@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import { useStore } from '../store/store';
 import { format, startOfMonth, endOfMonth, addMonths, parseISO, eachDayOfInterval } from 'date-fns';
 import CashFlowChart from '../components/charts/CashFlowChart';
-import type { Transaction, Subscription } from '../store/types';
 
 export default function CashFlow() {
   const { transactions, subscriptions, accounts } = useStore();

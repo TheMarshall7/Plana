@@ -1,4 +1,7 @@
+/// <reference types="vite/client" />
 /// <reference types="react" />
+
+import 'react';
 
 declare global {
   namespace JSX {

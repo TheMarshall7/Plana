@@ -131,83 +131,83 @@ export default function Accounts() {
         ) : (
           <div className="lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 space-y-3">
             {activeAccounts.map((account) => {
-            const balance = getAccountBalance(account);
-            const accountType = accountTypes.find(t => t.value === account.type);
-            
-            return (
-              <div
-                key={account.id}
-                className="glass-card rounded-2xl p-4 hover:bg-white/5 transition-colors cursor-pointer"
-                onClick={() => navigate(`/transactions?account=${account.id}`)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center"
-                      style={{ backgroundColor: account.color || '#10b981', opacity: 0.2 }}
-                    >
-                      <iconify-icon
-                        icon={accountType?.icon || 'solar:folder-linear'}
-                        className="text-white"
-                        width="24"
-                      ></iconify-icon>
+              const balance = getAccountBalance(account);
+              const accountType = accountTypes.find(t => t.value === account.type);
+              
+              return (
+                <div
+                  key={account.id}
+                  className="glass-card rounded-2xl p-4 hover:bg-white/5 transition-colors cursor-pointer"
+                  onClick={() => navigate(`/transactions?account=${account.id}`)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-12 h-12 rounded-xl flex items-center justify-center"
+                        style={{ backgroundColor: account.color || '#10b981', opacity: 0.2 }}
+                      >
+                        <iconify-icon
+                          icon={accountType?.icon || 'solar:folder-linear'}
+                          className="text-white"
+                          width="24"
+                        ></iconify-icon>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-white/90">{account.name}</p>
+                        <div className="flex items-center gap-2 text-xs text-white/50">
+                          <span>{accountType?.label}</span>
+                          {account.institution && (
+                            <>
+                              <span>•</span>
+                              <span>{account.institution}</span>
+                            </>
+                          )}
+                          {account.integrationType && (
+                            <>
+                              <span>•</span>
+                              <span className="text-emerald-400">{account.integrationType}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-white/90">{account.name}</p>
-                      <div className="flex items-center gap-2 text-xs text-white/50">
-                        <span>{accountType?.label}</span>
-                        {account.institution && (
-                          <>
-                            <span>•</span>
-                            <span>{account.institution}</span>
-                          </>
-                        )}
-                        {account.integrationType && (
-                          <>
-                            <span>•</span>
-                            <span className="text-emerald-400">{account.integrationType}</span>
-                          </>
-                        )}
+                    <div className="text-right">
+                      <p className={`text-sm font-semibold ${balance >= 0 ? 'text-white/90' : 'text-red-400'}`}>
+                        ${balance.toLocaleString()}
+                      </p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(account);
+                          }}
+                          className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center transition-colors"
+                        >
+                          <iconify-icon icon="solar:pen-linear" className="text-white/70" width="18"></iconify-icon>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleArchive(account.id, true);
+                          }}
+                          className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center transition-colors"
+                        >
+                          <iconify-icon icon="solar:archive-linear" className="text-white/70" width="18"></iconify-icon>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(account.id);
+                          }}
+                          className="w-8 h-8 rounded-lg hover:bg-red-500/20 flex items-center justify-center transition-colors"
+                        >
+                          <iconify-icon icon="solar:trash-bin-linear" className="text-red-400" width="18"></iconify-icon>
+                        </button>
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className={`text-sm font-semibold ${balance >= 0 ? 'text-white/90' : 'text-red-400'}`}>
-                      ${balance.toLocaleString()}
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEdit(account);
-                        }}
-                        className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center transition-colors"
-                      >
-                        <iconify-icon icon="solar:pen-linear" className="text-white/70" width="18"></iconify-icon>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleArchive(account.id, true);
-                        }}
-                        className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center transition-colors"
-                      >
-                        <iconify-icon icon="solar:archive-linear" className="text-white/70" width="18"></iconify-icon>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(account.id);
-                        }}
-                        className="w-8 h-8 rounded-lg hover:bg-red-500/20 flex items-center justify-center transition-colors"
-                      >
-                        <iconify-icon icon="solar:trash-bin-linear" className="text-red-400" width="18"></iconify-icon>
-                      </button>
-                    </div>
-                  </div>
                 </div>
-              </div>
-            );
+              );
             })}
           </div>
         )}
