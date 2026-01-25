@@ -153,7 +153,7 @@ export const useStore = create<AppState>()(
       },
 
       getSafeToSpend: () => {
-        const { accounts, subscriptions, transactions } = get();
+        const { accounts, subscriptions } = get();
         const checkingAccounts = accounts.filter((a) => a.type === 'checking' && !a.archived);
         const totalCash = checkingAccounts.reduce((sum, acc) => sum + acc.balance, 0);
         

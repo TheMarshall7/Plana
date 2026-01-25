@@ -218,8 +218,6 @@ export default function CashFlow() {
             </div>
             <div className="grid grid-cols-7 gap-1">
               {calendarDays.map((day, index) => {
-                const _weekStart = startOfWeek(monthStart);
-                const _dayOfWeek = day.date.getDay();
                 const isCurrentMonth = day.date.getMonth() === selectedMonth.getMonth();
                 
                 return (
