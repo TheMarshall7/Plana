@@ -8,7 +8,7 @@ interface StripeIntegrationProps {
   onTest: () => void;
 }
 
-export default function StripeIntegration({ accountId, integrationId, onSave, onTest }: StripeIntegrationProps) {
+export default function StripeIntegration({ accountId: _accountId, integrationId, onSave, onTest }: StripeIntegrationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [apiKey, setApiKey] = useState(integrationId || '');
 

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useStore } from '../store/store';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import Modal from '../components/Modal';
 import DebtPayoffChart from '../components/charts/DebtPayoffChart';
 import type { Debt } from '../store/types';
@@ -134,7 +134,7 @@ export default function Debt() {
           </div>
         ) : (
           payoffPlans.map((debt) => {
-            const account = accounts.find(a => a.id === debt.accountId);
+            const _account = accounts.find(a => a.id === debt.accountId);
             const nextPayment = getNextPaymentDate(debt);
             const daysUntilDue = Math.ceil((nextPayment.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
 
@@ -351,7 +351,7 @@ function DebtModal({ isOpen, onClose, debt, accounts, onSave }: DebtModalProps) 
           <label className="block text-sm font-medium text-white/70 mb-1">Payoff Strategy</label>
           <select
             value={formData.payoffStrategy}
-            onChange={(e) => setFormData({ ...formData, payoffStrategy: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, payoffStrategy: e.target.value as 'snowball' | 'avalanche' })}
             className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
           >
             <option value="snowball">Snowball (Smallest balance first)</option>

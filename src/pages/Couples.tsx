@@ -188,7 +188,7 @@ function CouplesSettingsModal({ isOpen, onClose, settings, onSave }: CouplesSett
       enabled: formData.enabled,
       funMoneyAmount: parseFloat(formData.funMoneyAmount) || 0,
       jointSpendingThreshold: parseFloat(formData.jointSpendingThreshold) || 0,
-      checkInFrequency: formData.checkInFrequency || undefined,
+      checkInFrequency: (formData.checkInFrequency as 'weekly' | 'biweekly' | 'monthly' | undefined) || undefined,
     });
   };
 

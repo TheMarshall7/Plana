@@ -8,7 +8,7 @@ interface PayPalIntegrationProps {
   onTest: () => void;
 }
 
-export default function PayPalIntegration({ accountId, integrationId, onSave, onTest }: PayPalIntegrationProps) {
+export default function PayPalIntegration({ accountId: _accountId, integrationId, onSave, onTest }: PayPalIntegrationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [apiKey, setApiKey] = useState(integrationId || '');
 

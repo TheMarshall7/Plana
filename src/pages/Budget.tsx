@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useStore } from '../store/store';
 import { format, startOfMonth, endOfMonth, subMonths, addMonths, parseISO } from 'date-fns';
 import Modal from '../components/Modal';
+import CategoryPieChart from '../components/charts/CategoryPieChart';
 import type { Budget, BudgetCategory } from '../store/types';
 
 const categories = [

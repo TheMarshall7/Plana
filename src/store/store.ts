@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AppState, Account, Transaction, Budget, Subscription, Goal, Debt, CouplesSettings, Settings } from './types';
+import type { AppState, Account, Transaction, Subscription, Goal, Debt, Settings } from './types';
 
 // Seed data for demo
 const seedAccounts: Account[] = [
@@ -159,7 +159,6 @@ export const useStore = create<AppState>()(
         
         // Calculate upcoming bills
         const now = new Date();
-        const currentMonth = now.getMonth() + 1;
         const upcomingBills = subscriptions
           .filter((s) => !s.cancelled && s.dueDate >= now.getDate())
           .reduce((sum, s) => sum + s.amount, 0);
@@ -222,7 +221,7 @@ export const useStore = create<AppState>()(
       },
 
       getLowCashWarning: () => {
-        const { accounts, transactions, subscriptions } = get();
+        const { accounts, transactions } = get();
         const checkingAccounts = accounts.filter(a => a.type === 'checking' && !a.archived);
         let totalCash = 0;
         checkingAccounts.forEach(acc => {

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useStore } from '../store/store';
-import { format, startOfMonth, endOfMonth, addMonths, parseISO, eachDayOfInterval, startOfWeek, endOfWeek } from 'date-fns';
+import { format, startOfMonth, endOfMonth, addMonths, parseISO, eachDayOfInterval, startOfWeek } from 'date-fns';
 import CashFlowChart from '../components/charts/CashFlowChart';
 import type { Transaction, Subscription } from '../store/types';
 
@@ -12,8 +12,6 @@ export default function CashFlow() {
   const monthStart = startOfMonth(selectedMonth);
   const monthEnd = endOfMonth(selectedMonth);
   const nextMonth = addMonths(selectedMonth, 1);
-  const nextMonthStart = startOfMonth(nextMonth);
-  const nextMonthEnd = endOfMonth(nextMonth);
 
   // Calculate current month cash flow
   const currentMonthFlow = useMemo(() => {
@@ -220,8 +218,8 @@ export default function CashFlow() {
             </div>
             <div className="grid grid-cols-7 gap-1">
               {calendarDays.map((day, index) => {
-                const weekStart = startOfWeek(monthStart);
-                const dayOfWeek = day.date.getDay();
+                const _weekStart = startOfWeek(monthStart);
+                const _dayOfWeek = day.date.getDay();
                 const isCurrentMonth = day.date.getMonth() === selectedMonth.getMonth();
                 
                 return (

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/store';
-import type { Account } from '../store/types';
 
 export default function Onboarding() {
   const navigate = useNavigate();

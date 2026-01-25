@@ -8,7 +8,7 @@ interface GoHighLevelIntegrationProps {
   onTest: () => void;
 }
 
-export default function GoHighLevelIntegration({ accountId, integrationId, onSave, onTest }: GoHighLevelIntegrationProps) {
+export default function GoHighLevelIntegration({ accountId: _accountId, integrationId, onSave, onTest }: GoHighLevelIntegrationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [apiKey, setApiKey] = useState(integrationId || '');
 

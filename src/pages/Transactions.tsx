@@ -392,7 +392,7 @@ function TransactionModal({ isOpen, onClose, transaction, accounts, onSave }: Tr
           <label className="block text-sm font-medium text-white/70 mb-1">Type</label>
           <select
             value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, type: e.target.value as 'income' | 'expense' | 'transfer' })}
             className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
           >
             <option value="income">Income</option>

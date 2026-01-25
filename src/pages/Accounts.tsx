@@ -308,7 +308,7 @@ function AccountModal({ isOpen, onClose, account, onSave }: AccountModalProps) {
       balance: parseFloat(formData.balance) || 0,
       color: formData.color,
       institution: formData.institution || undefined,
-      integrationType: formData.integrationType || undefined,
+      integrationType: (formData.integrationType as 'paypal' | 'stripe' | 'gohighlevel' | undefined) || undefined,
       integrationId: formData.integrationId || undefined,
       archived: false,
     });
