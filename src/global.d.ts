@@ -1,11 +1,17 @@
 /// <reference types="react" />
 
-declare namespace JSX {
-  interface IntrinsicElements {
-    'iconify-icon': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
-      icon?: string;
-      width?: string | number;
-      className?: string;
-    }, HTMLElement>;
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'iconify-icon': {
+        icon?: string;
+        width?: string | number;
+        className?: string;
+        style?: React.CSSProperties;
+        [key: string]: any;
+      };
+    }
   }
 }
+
+export {};
