@@ -48,7 +48,7 @@ export default function Goals() {
         <h1 className="text-2xl font-semibold text-white/90">Goals</h1>
         <button
           onClick={handleAdd}
-          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+          className="px-4 py-2 btn-primary text-white rounded-lg font-medium flex items-center gap-2"
         >
           <iconify-icon icon="solar:add-linear" width="20"></iconify-icon>
           Add Goal

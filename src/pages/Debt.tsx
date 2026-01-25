@@ -76,7 +76,7 @@ export default function Debt() {
         <h1 className="text-2xl font-semibold text-white/90">Debt</h1>
         <button
           onClick={handleAdd}
-          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+          className="px-4 py-2 btn-primary text-white rounded-lg font-medium flex items-center gap-2"
         >
           <iconify-icon icon="solar:add-linear" width="20"></iconify-icon>
           Add Debt
@@ -134,7 +134,6 @@ export default function Debt() {
           </div>
         ) : (
           payoffPlans.map((debt) => {
-            const _account = accounts.find(a => a.id === debt.accountId);
             const nextPayment = getNextPaymentDate(debt);
             const daysUntilDue = Math.ceil((nextPayment.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
 
@@ -363,7 +362,7 @@ function DebtModal({ isOpen, onClose, debt, accounts, onSave }: DebtModalProps) 
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg font-medium transition-colors"
+            className="flex-1 px-4 py-2 btn-secondary text-white rounded-lg font-medium"
           >
             Cancel
           </button>

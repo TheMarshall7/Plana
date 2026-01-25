@@ -207,7 +207,6 @@ export default function Subscriptions() {
           <>
             <h2 className="text-sm font-medium text-white/80 mt-6">Cancelled</h2>
             {cancelledSubscriptions.map((subscription) => {
-              const _account = accounts.find(a => a.id === subscription.accountId);
               return (
                 <div key={subscription.id} className="glass-card rounded-2xl p-4 opacity-60">
                   <div className="flex items-center justify-between">

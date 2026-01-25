@@ -53,7 +53,7 @@ export default function Couples() {
         <h1 className="text-2xl font-semibold text-white/90">Couples</h1>
         <button
           onClick={() => setIsSettingsOpen(true)}
-          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+          className="px-4 py-2 btn-primary text-white rounded-lg font-medium flex items-center gap-2"
         >
           <iconify-icon icon="solar:settings-linear" width="20"></iconify-icon>
           Settings
@@ -259,7 +259,7 @@ function CouplesSettingsModal({ isOpen, onClose, settings, onSave }: CouplesSett
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg font-medium transition-colors"
+            className="flex-1 px-4 py-2 btn-secondary text-white rounded-lg font-medium"
           >
             Cancel
           </button>

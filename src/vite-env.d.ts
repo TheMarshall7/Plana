@@ -1,20 +1,17 @@
 /// <reference types="vite/client" />
-/// <reference types="react" />
 
-import 'react';
-
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'iconify-icon': {
+declare namespace JSX {
+  interface IntrinsicElements {
+    'iconify-icon': React.DetailedHTMLProps<
+      React.HTMLAttributes<HTMLElement> & {
         icon?: string;
         width?: string | number;
-        className?: string;
-        style?: React.CSSProperties;
-        [key: string]: any;
-      };
-    }
+        height?: string | number;
+        flip?: string;
+        rotate?: string;
+        inline?: boolean;
+      },
+      HTMLElement
+    >;
   }
 }
-
-export {};
