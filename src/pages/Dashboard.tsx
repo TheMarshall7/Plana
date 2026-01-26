@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/store';
 import NetWorthChart from '../components/charts/NetWorthChart';
 import AccountBalanceChart from '../components/charts/AccountBalanceChart';
@@ -7,6 +8,7 @@ import CategoryPieChart from '../components/charts/CategoryPieChart';
 import PersonalizedGreeting from '../components/PersonalizedGreeting';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { getSafeToSpend, accounts, subscriptions, transactions, addToast, users, activeUserId, getAccountBalance } = useStore();
   const activeUser = users.find(u => u.id === activeUserId) || users[0];
   const safeToSpend = getSafeToSpend();
@@ -155,25 +157,49 @@ export default function Dashboard() {
           <section className="glass-card rounded-[28px] p-6">
             <h2 className="text-sm font-medium text-white/80 mb-6 px-1">Quick Actions</h2>
             <div className="grid grid-cols-4 lg:grid-cols-2 gap-4">
-              <button className="flex flex-col items-center gap-2 group p-3 rounded-2xl hover:bg-white/[0.03] transition-all">
+              <button
+                onClick={() => {
+                  navigate('/transactions');
+                  addToast('Opening Transactions...', 'info');
+                }}
+                className="flex flex-col items-center gap-2 group p-3 rounded-2xl hover:bg-white/[0.03] transition-all"
+              >
                 <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/10 group-hover:scale-110 transition-transform">
                   <iconify-icon icon="solar:card-transfer-linear" width="24"></iconify-icon>
                 </div>
                 <span className="text-[10px] font-medium text-white/50">Transfer</span>
               </button>
-              <button className="flex flex-col items-center gap-2 group p-3 rounded-2xl hover:bg-white/[0.03] transition-all">
+              <button
+                onClick={() => {
+                  navigate('/subscriptions');
+                  addToast('Opening Subscriptions...', 'info');
+                }}
+                className="flex flex-col items-center gap-2 group p-3 rounded-2xl hover:bg-white/[0.03] transition-all"
+              >
                 <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/10 group-hover:scale-110 transition-transform">
                   <iconify-icon icon="solar:bill-list-linear" width="24"></iconify-icon>
                 </div>
                 <span className="text-[10px] font-medium text-white/50">Add Bill</span>
               </button>
-              <button className="flex flex-col items-center gap-2 group p-3 rounded-2xl hover:bg-white/[0.03] transition-all">
+              <button
+                onClick={() => {
+                  navigate('/budget');
+                  addToast('Opening Budget...', 'info');
+                }}
+                className="flex flex-col items-center gap-2 group p-3 rounded-2xl hover:bg-white/[0.03] transition-all"
+              >
                 <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/10 group-hover:scale-110 transition-transform">
                   <iconify-icon icon="solar:pie-chart-2-linear" width="24"></iconify-icon>
                 </div>
                 <span className="text-[10px] font-medium text-white/50">Budget</span>
               </button>
-              <button className="flex flex-col items-center gap-2 group p-3 rounded-2xl hover:bg-white/[0.03] transition-all">
+              <button
+                onClick={() => {
+                  navigate('/goals');
+                  addToast('Opening Goals...', 'info');
+                }}
+                className="flex flex-col items-center gap-2 group p-3 rounded-2xl hover:bg-white/[0.03] transition-all"
+              >
                 <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center text-yellow-400 border border-yellow-500/10 group-hover:scale-110 transition-transform">
                   <iconify-icon icon="solar:target-linear" width="24"></iconify-icon>
                 </div>
