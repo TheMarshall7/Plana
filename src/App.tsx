@@ -17,6 +17,8 @@ import Debt from './pages/Debt';
 import CashFlow from './pages/CashFlow';
 import Settings from './pages/Settings';
 import Onboarding from './pages/Onboarding';
+import Travel from './pages/Travel';
+import TripDetailsView from './components/travel/TripDetailsView';
 
 import ToastContainer from './components/ToastContainer';
 
@@ -78,6 +80,8 @@ function App() {
                     <Route path="/couples" element={<Couples />} />
                     <Route path="/debt" element={<Debt />} />
                     <Route path="/cash-flow" element={<CashFlow />} />
+                    <Route path="/travel" element={<Travel />} />
+                    <Route path="/travel/:id" element={<TripDetailsView />} />
                     <Route path="/settings" element={<Settings />} />
                   </Routes>
                 </div>
@@ -104,6 +108,8 @@ function App() {
                   <Route path="/couples" element={<Couples />} />
                   <Route path="/debt" element={<Debt />} />
                   <Route path="/cash-flow" element={<CashFlow />} />
+                  <Route path="/travel" element={<Travel />} />
+                  <Route path="/travel/:id" element={<TripDetailsView />} />
                   <Route path="/settings" element={<Settings />} />
                 </Routes>
               </div>

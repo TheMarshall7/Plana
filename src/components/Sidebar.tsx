@@ -12,6 +12,7 @@ export default function Sidebar() {
     { path: '/goals', icon: 'solar:target-linear', label: 'Goals' },
     { path: '/debt', icon: 'solar:document-text-linear', label: 'Debt' },
     { path: '/cash-flow', icon: 'solar:calendar-mark-linear', label: 'Cash Flow' },
+    { path: '/travel', icon: 'solar:palmtree-linear', label: 'Travel' },
     { path: '/couples', icon: 'solar:heart-linear', label: 'Couples' },
     { path: '/settings', icon: 'solar:settings-linear', label: 'Settings' },
   ];
@@ -31,11 +32,10 @@ export default function Sidebar() {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                isActive(item.path)
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive(item.path)
                   ? 'bg-emerald-500/20 text-emerald-400'
                   : 'text-white/70 hover:bg-white/5 hover:text-white'
-              }`}
+                }`}
             >
               <iconify-icon icon={item.icon} width="20"></iconify-icon>
               <span className="text-sm font-medium">{item.label}</span>

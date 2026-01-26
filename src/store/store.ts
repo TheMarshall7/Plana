@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AppState, Account, Transaction, Subscription, Goal, Debt, Settings } from './types';
+import type { AppState, Account, Transaction, Subscription, Goal, Debt, Settings, Trip, ItineraryItem } from './types';
 
 // Seed data for demo
 const seedAccounts: Account[] = [
@@ -155,6 +155,62 @@ export const useStore = create<AppState>()(
       removeToast: (id) => {
         set((state) => ({
           toasts: state.toasts.filter((t) => t.id !== id),
+        }));
+      },
+
+      trips: [],
+      addTrip: (trip) => {
+        const newTrip: Trip = {
+          ...trip,
+          id: Date.now().toString(),
+          itinerary: [],
+        };
+        set((state) => ({ trips: [...state.trips, newTrip] }));
+      },
+      updateTrip: (id, updates) => {
+        set((state) => ({
+          trips: state.trips.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+        }));
+      },
+      deleteTrip: (id) => {
+        set((state) => ({ trips: state.trips.filter((t) => t.id !== id) }));
+      },
+      addItineraryItem: (tripId, item) => {
+        const newItem: ItineraryItem = {
+          ...item,
+          id: Date.now().toString(),
+          tripId,
+        };
+        set((state) => ({
+          trips: state.trips.map((t) =>
+            t.id === tripId ? { ...t, itinerary: [...t.itinerary, newItem] } : t
+          ),
+        }));
+      },
+      updateItineraryItem: (tripId, itemId, updates) => {
+        set((state) => ({
+          trips: state.trips.map((t) =>
+            t.id === tripId
+              ? {
+                ...t,
+                itinerary: t.itinerary.map((item) =>
+                  item.id === itemId ? { ...item, ...updates } : item
+                ),
+              }
+              : t
+          ),
+        }));
+      },
+      deleteItineraryItem: (tripId, itemId) => {
+        set((state) => ({
+          trips: state.trips.map((t) =>
+            t.id === tripId
+              ? {
+                ...t,
+                itinerary: t.itinerary.filter((item) => item.id !== itemId),
+              }
+              : t
+          ),
         }));
       },
 

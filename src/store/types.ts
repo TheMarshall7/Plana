@@ -37,6 +37,31 @@ export interface Transaction {
   isSplit?: boolean;
   splitTransactionId?: string;
   coupleMemberId?: string;
+  tripId?: string;
+}
+
+// Travel Types
+export interface ItineraryItem {
+  id: string;
+  tripId: string;
+  date: string;
+  time?: string;
+  activity: string;
+  location?: string;
+  cost?: number;
+}
+
+export interface Trip {
+  id: string;
+  name: string;
+  destination: string;
+  startDate: string;
+  endDate: string;
+  budget: number;
+  notes?: string;
+  itinerary: ItineraryItem[];
+  documents?: string[]; // URLs or storage refs
+  isArchived?: boolean;
 }
 
 // Budget
@@ -131,6 +156,7 @@ export interface AppState {
   couples: CouplesSettings;
   settings: Settings;
   toasts: Toast[];
+  trips: Trip[];
 
   // Actions
   addAccount: (account: Omit<Account, 'id'>) => void;
@@ -158,6 +184,13 @@ export interface AppState {
 
   updateCouples: (updates: Partial<CouplesSettings>) => void;
   updateSettings: (updates: Partial<Settings>) => void;
+
+  addTrip: (trip: Omit<Trip, 'id' | 'itinerary'>) => void;
+  updateTrip: (id: string, updates: Partial<Trip>) => void;
+  deleteTrip: (id: string) => void;
+  addItineraryItem: (tripId: string, item: Omit<ItineraryItem, 'id' | 'tripId'>) => void;
+  updateItineraryItem: (tripId: string, itemId: string, updates: Partial<ItineraryItem>) => void;
+  deleteItineraryItem: (tripId: string, itemId: string) => void;
 
   addToast: (message: string, type?: 'success' | 'error' | 'info') => void;
   removeToast: (id: string) => void;
