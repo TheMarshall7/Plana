@@ -214,6 +214,9 @@ export interface AppState {
   setActiveUser: (id: string) => void;
   updateUser: (id: string, updates: Partial<User>) => void;
 
+  unreadNotifications: boolean;
+  markNotificationsRead: () => void;
+
   // Utilities
   getAccountBalance: (accountId: string) => number;
   getSafeToSpend: () => number;

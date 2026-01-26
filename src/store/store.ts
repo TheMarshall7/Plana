@@ -311,6 +311,9 @@ export const useStore = create<AppState>()(
         }));
       },
 
+      unreadNotifications: true,
+      markNotificationsRead: () => set({ unreadNotifications: false }),
+
       // Utilities
       getAccountBalance: (accountId) => {
         const state = get();

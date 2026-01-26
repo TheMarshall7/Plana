@@ -269,6 +269,83 @@ export default function Settings() {
         )}
       </div>
 
+      {/* AI Data Import */}
+      <div className="glass-card rounded-2xl p-4 space-y-4">
+        <div className="flex items-center gap-2">
+          <iconify-icon icon="solar:chat-round-line-linear" className="text-purple-400" width="20"></iconify-icon>
+          <h2 className="text-sm font-medium text-white/90">Import from ChatGPT</h2>
+        </div>
+
+        <p className="text-xs text-white/60">
+          Use ChatGPT to organize your finances, then paste the results directly into Plana.
+        </p>
+
+        <div className="space-y-3">
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+            <p className="text-xs font-medium text-white/80 mb-2">Step 1: Copy this prompt to ChatGPT</p>
+            <div className="bg-black/30 rounded-lg p-3 text-[10px] font-mono text-white/70 max-h-32 overflow-y-auto">
+              {`Please organize my financial data into JSON format with this exact structure:
+
+{
+  "accounts": [
+    {"name": "Account Name", "type": "checking|savings|credit", "balance": 0, "color": "#10b981", "institution": "Bank Name", "archived": false}
+  ],
+  "transactions": [
+    {"accountId": "1", "amount": 0, "type": "income|expense", "category": "Category", "description": "Description", "date": "2026-01-26"}
+  ],
+  "subscriptions": [
+    {"name": "Service", "amount": 0, "cadence": "monthly", "dueDate": 1, "category": "Bills", "accountId": "1"}
+  ],
+  "goals": [
+    {"name": "Goal Name", "targetAmount": 0, "currentAmount": 0}
+  ],
+  "debts": [
+    {"name": "Debt Name", "balance": 0, "apr": 0, "minimumPayment": 0, "dueDate": 1, "accountId": "1"}
+  ]
+}`}
+            </div>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`Please organize my financial data into JSON format with this exact structure:
+
+{
+  "accounts": [
+    {"name": "Account Name", "type": "checking|savings|credit", "balance": 0, "color": "#10b981", "institution": "Bank Name", "archived": false}
+  ],
+  "transactions": [
+    {"accountId": "1", "amount": 0, "type": "income|expense", "category": "Category", "description": "Description", "date": "2026-01-26"}
+  ],
+  "subscriptions": [
+    {"name": "Service", "amount": 0, "cadence": "monthly", "dueDate": 1, "category": "Bills", "accountId": "1"}
+  ],
+  "goals": [
+    {"name": "Goal Name", "targetAmount": 0, "currentAmount": 0}
+  ],
+  "debts": [
+    {"name": "Debt Name", "balance": 0, "apr": 0, "minimumPayment": 0, "dueDate": 1, "accountId": "1"}
+  ]
+}`);
+                addToast('Prompt copied to clipboard!', 'success');
+              }}
+              className="mt-2 w-full px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg text-xs font-medium transition-colors"
+            >
+              Copy Prompt
+            </button>
+          </div>
+
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+            <p className="text-xs font-medium text-white/80 mb-2">Step 2: Import the JSON response</p>
+            <button
+              onClick={() => setIsImportModalOpen(true)}
+              className="w-full px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+            >
+              <iconify-icon icon="solar:upload-linear" width="20"></iconify-icon>
+              Paste & Import Data
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Data Management */}
       <div className="glass-card rounded-2xl p-4 space-y-3">
         <h2 className="text-sm font-medium text-white/90">Data Management</h2>
