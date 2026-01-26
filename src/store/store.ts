@@ -2,6 +2,90 @@ import { create } from 'zustand';
 import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import type { AppState, Account, Transaction, Subscription, Goal, Debt, Settings, Trip, ItineraryItem } from './types';
 
+// Debounced Supabase sync for mobile-friendly auto-save
+let supabaseSyncTimeout: NodeJS.Timeout | null = null;
+let pendingSyncData: { name: string; value: string } | null = null;
+
+const syncToSupabase = async (name: string, value: string) => {
+  try {
+    // Check if online (mobile-friendly)
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      console.log('Offline - will retry Supabase sync when online');
+      pendingSyncData = { name, value };
+      return;
+    }
+
+    const state = JSON.parse(value);
+    const { supabaseUrl, supabaseKey } = state.state.settings || {};
+
+    if (supabaseUrl && supabaseKey) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout for mobile
+
+      try {
+        const response = await fetch(`${supabaseUrl}/rest/v1/user_data?id=eq.primary`, {
+          method: 'POST',
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify({
+            id: 'primary',
+            data: state,
+            updated_at: new Date().toISOString()
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          console.log('✓ Supabase sync successful');
+          pendingSyncData = null; // Clear pending data on success
+        } else {
+          console.warn('Supabase sync failed:', response.status);
+          pendingSyncData = { name, value }; // Store for retry
+        }
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          console.warn('Supabase sync timeout - will retry');
+        } else {
+          console.warn('Supabase sync error:', fetchError);
+        }
+        pendingSyncData = { name, value }; // Store for retry
+      }
+    }
+  } catch (error) {
+    console.warn('Cloud sync failed:', error);
+    pendingSyncData = { name, value }; // Store for retry
+  }
+};
+
+const debouncedSupabaseSync = (name: string, value: string) => {
+  // Clear existing timeout
+  if (supabaseSyncTimeout) {
+    clearTimeout(supabaseSyncTimeout);
+  }
+
+  // Set new timeout (500ms debounce for mobile)
+  supabaseSyncTimeout = setTimeout(() => {
+    syncToSupabase(name, value);
+  }, 500);
+};
+
+// Retry pending sync when coming back online
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    if (pendingSyncData) {
+      console.log('Back online - retrying Supabase sync');
+      syncToSupabase(pendingSyncData.name, pendingSyncData.value);
+    }
+  });
+}
+
 // Custom storage to sync with local file system via Vite dev server
 const apiStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
@@ -13,17 +97,30 @@ const apiStorage: StateStorage = {
         const { supabaseUrl, supabaseKey } = state.state.settings || {};
 
         if (supabaseUrl && supabaseKey) {
-          const response = await fetch(`${supabaseUrl}/rest/v1/user_data?select=data&limit=1`, {
-            headers: {
-              'apikey': supabaseKey,
-              'Authorization': `Bearer ${supabaseKey}`
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
+          try {
+            const response = await fetch(`${supabaseUrl}/rest/v1/user_data?select=data&limit=1`, {
+              headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`
+              },
+              signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+              const result = await response.json();
+              if (result && result.length > 0) {
+                console.log('✓ Loaded data from Supabase');
+                return JSON.stringify(result[0].data);
+              }
             }
-          });
-          if (response.ok) {
-            const result = await response.json();
-            if (result && result.length > 0) {
-              return JSON.stringify(result[0].data);
-            }
+          } catch (fetchError) {
+            clearTimeout(timeoutId);
+            console.warn('Supabase fetch failed, using local storage');
           }
         }
       }
@@ -43,44 +140,20 @@ const apiStorage: StateStorage = {
     return localStorage.getItem(name);
   },
   setItem: async (name: string, value: string): Promise<void> => {
+    // CRITICAL: Always update localStorage first (synchronous for mobile)
     localStorage.setItem(name, value);
 
-    // 1. Sync to Local Repo DB
-    try {
-      await fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: value,
-      });
-    } catch (error) {
-      console.error('Failed to sync with backend');
-    }
+    // 1. Sync to Local Repo DB (non-blocking)
+    fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: value,
+    }).catch(error => {
+      console.error('Failed to sync with backend:', error);
+    });
 
-    // 2. Sync to Supabase Cloud
-    try {
-      const state = JSON.parse(value);
-      const { supabaseUrl, supabaseKey } = state.state.settings || {};
-
-      if (supabaseUrl && supabaseKey) {
-        // Upsert data to a 'user_data' table
-        // We assume ID 'primary' for simplicity in this single-user app
-        await fetch(`${supabaseUrl}/rest/v1/user_data?id=eq.primary`, {
-          method: 'POST',
-          headers: {
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'resolution=merge-duplicates'
-          },
-          body: JSON.stringify({
-            id: 'primary',
-            data: state
-          }),
-        });
-      }
-    } catch (error) {
-      console.warn('Cloud sync failed');
-    }
+    // 2. Debounced Sync to Supabase Cloud (mobile-friendly)
+    debouncedSupabaseSync(name, value);
   },
   removeItem: (name: string): void => {
     localStorage.removeItem(name);
@@ -110,8 +183,8 @@ const seedSettings: Settings = {
   payoffStrategy: 'snowball',
   onboardingCompleted: false,
   seedData: true,
-  supabaseUrl: 'https://o6rfrHjCK88syRQV.supabase.co',
-  supabaseKey: 'sb_publishable_y5TS3jCVKls-LjaZbk-tNA_QXtx7b55',
+  supabaseUrl: 'https://evlnjtakkvwlxxspmelt.supabase.co',
+  supabaseKey: 'sb_secret_Ol-q0ujOBh2eWR1HgAmgcg_iXvJFIzx',
 };
 
 export const useStore = create<AppState>()(
