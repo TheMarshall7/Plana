@@ -30,190 +30,205 @@ export default function Dashboard() {
     .slice(0, 2);
 
   return (
-    <div className="px-5 lg:px-0 space-y-5 lg:space-y-6">
-      {/* Personalized Greeting */}
+    <div className="px-5 lg:px-0 space-y-6 lg:space-y-8 animate-fade-in">
       <PersonalizedGreeting userName={settings.userName} />
-      {/* Desktop: Top Row with Hero and Status */}
-      <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:space-y-0 space-y-5">
-        {/* 1. HERO CARD */}
-        <section className="lg:col-span-2 glass-card rounded-[32px] p-8 lg:p-10 text-center relative overflow-hidden group animate-fade-in">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-emerald-500/10 rounded-full blur-[60px] pointer-events-none"></div>
 
-          <div className="relative z-10 flex flex-col items-center">
-            <p className="text-emerald-200/60 text-sm font-medium tracking-wide uppercase mb-4">Safe to Spend Today</p>
+      {/* Main Grid Layout */}
+      <div className="lg:grid lg:grid-cols-12 lg:gap-8">
 
-            <div className="flex items-baseline gap-1 text-white mb-2">
-              <span className="text-3xl font-light text-white/50 align-top mt-2">$</span>
-              <span className="text-[4rem] leading-none font-medium tracking-tighter drop-shadow-lg">
-                {safeToSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}
-              </span>
+        {/* Left Column - Main Content (8/12) */}
+        <div className="lg:col-span-8 space-y-6 lg:space-y-8">
+
+          {/* 1. HERO CARD & KPIs */}
+          <section className="space-y-6">
+            <div className="glass-card rounded-[32px] p-8 lg:p-12 text-center relative overflow-hidden group">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-emerald-500/5 rounded-full blur-[80px] pointer-events-none"></div>
+
+              <div className="relative z-10 flex flex-col items-center">
+                <p className="text-emerald-200/60 text-sm font-medium tracking-wide uppercase mb-4">Safe to Spend Today</p>
+
+                <div className="flex items-baseline gap-1 text-white mb-2">
+                  <span className="text-4xl font-light text-white/30 align-top mt-2">$</span>
+                  <span className="text-[5rem] leading-none font-medium tracking-tighter drop-shadow-xl text-balance">
+                    {safeToSpend.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                  </span>
+                </div>
+
+                <div className="mt-8 inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/5 backdrop-blur-xl">
+                  <iconify-icon icon="solar:calendar-mark-linear" className="text-emerald-400" width="16"></iconify-icon>
+                  <span className="text-sm text-white/70 font-medium">After bills · Next Payday in 4 days</span>
+                </div>
+              </div>
             </div>
 
-            <div className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/5 backdrop-blur-md">
-              <iconify-icon icon="solar:calendar-mark-linear" className="text-emerald-400" width="14"></iconify-icon>
-              <span className="text-xs text-white/70 font-medium">After bills · Payday in 4 days</span>
+            {/* KPI Summary Strip */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="glass-card rounded-[24px] p-5 flex flex-col items-center justify-center group hover:bg-white/[0.02] transition-colors">
+                <span className="text-[10px] uppercase tracking-[0.1em] text-white/40 font-bold mb-2">Total Cash</span>
+                <span className="text-lg font-semibold text-white/90">${totalCash.toLocaleString()}</span>
+              </div>
+              <div className="glass-card rounded-[24px] p-5 flex flex-col items-center justify-center group hover:bg-white/[0.02] transition-colors">
+                <span className="text-[10px] uppercase tracking-[0.1em] text-white/40 font-bold mb-2">Monthly Income</span>
+                <span className="text-lg font-semibold text-emerald-400">${monthlyIncome.toLocaleString()}</span>
+              </div>
+              <div className="glass-card rounded-[24px] p-5 flex flex-col items-center justify-center group hover:bg-white/[0.02] transition-colors">
+                <span className="text-[10px] uppercase tracking-[0.1em] text-white/40 font-bold mb-2">Spent This Month</span>
+                <span className="text-lg font-semibold text-rose-400">${monthlySpent.toLocaleString()}</span>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* 2. MONEY STATUS CARD */}
-        <section className="glass-card rounded-2xl p-4 lg:p-6 flex items-center justify-between animate-fade-in delay-100">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-              <iconify-icon icon="solar:check-circle-linear" width="18"></iconify-icon>
+          {/* 2. MAIN CHARTS SECTION */}
+          <section className="space-y-6">
+            <div className="flex items-center justify-between px-1">
+              <h2 className="text-lg font-medium text-white/90">Financial Trends</h2>
+              <div className="flex gap-2">
+                <span className="px-3 py-1 rounded-full bg-white/5 border border-white/5 text-[10px] text-white/50">Last 6 Months</span>
+              </div>
             </div>
-            <p className="text-sm text-emerald-100/90 font-medium">You are on track for the week.</p>
-          </div>
-          <iconify-icon icon="solar:alt-arrow-right-linear" className="text-white/30" width="16"></iconify-icon>
-        </section>
-      </div>
 
-      {/* 3. KPI SUMMARY STRIP */}
-      <section className="grid grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4 animate-fade-in delay-100">
-        <div className="glass-card rounded-2xl p-4 flex flex-col items-center justify-center">
-          <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium mb-1">Cash</span>
-          <span className="text-sm font-semibold text-white/90">${totalCash.toLocaleString()}</span>
-        </div>
-        <div className="glass-card rounded-2xl p-4 flex flex-col items-center justify-center">
-          <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium mb-1">Income</span>
-          <span className="text-sm font-semibold text-emerald-200">${monthlyIncome.toLocaleString()}</span>
-        </div>
-        <div className="glass-card rounded-2xl p-4 lg:p-5 flex flex-col items-center justify-center">
-          <span className="text-[10px] lg:text-xs uppercase tracking-wider text-white/40 font-medium mb-1">Spent</span>
-          <span className="text-sm lg:text-base font-semibold text-white/90">${monthlySpent.toLocaleString()}</span>
-        </div>
-        <div className="hidden lg:flex glass-card rounded-2xl p-4 lg:p-5 flex-col items-center justify-center">
-          <span className="text-xs uppercase tracking-wider text-white/40 font-medium mb-1">Net Worth</span>
-          <span className="text-base font-semibold text-emerald-400">${(totalCash - Math.abs(accounts.filter(a => a.type === 'credit' || a.type === 'loan').reduce((sum, a) => sum + (a.balance < 0 ? Math.abs(a.balance) : 0), 0))).toLocaleString()}</span>
-        </div>
-      </section>
+            <div className="grid lg:grid-cols-1 gap-6">
+              {/* Primary Net Worth Chart */}
+              {accounts.filter(a => !a.archived).length > 0 && (
+                <div className="glass-card rounded-[28px] p-6 lg:p-8">
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <h3 className="text-sm font-medium text-white/90">Net Worth Growth</h3>
+                      <p className="text-xs text-white/40 mt-1">Tracking cumulative asset value</p>
+                    </div>
+                  </div>
+                  <NetWorthChart accounts={accounts} transactions={transactions} months={6} />
+                </div>
+              )}
 
-      {/* Desktop: Middle Row with Next Move and Quick Actions */}
-      <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:space-y-0 space-y-5">
-        {/* 4. YOUR NEXT MOVE (COACHING) */}
-        <section className="lg:col-span-2 glass-card rounded-2xl p-5 lg:p-6 relative overflow-hidden animate-fade-in delay-200">
-          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-yellow-200/40 to-transparent"></div>
+              {/* Spending Trend Chart */}
+              {transactions.filter(t => t.type === 'expense').length > 0 && (
+                <div className="glass-card rounded-[28px] p-6 lg:p-8">
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <h3 className="text-sm font-medium text-white/90">Spending Intensity</h3>
+                      <p className="text-xs text-white/40 mt-1">Monthly outflow analysis</p>
+                    </div>
+                  </div>
+                  <SpendingTrendChart transactions={transactions} months={6} />
+                </div>
+              )}
 
-          <div className="flex gap-4">
-            <div className="mt-1 w-10 h-10 rounded-full bg-yellow-500/10 flex-shrink-0 flex items-center justify-center border border-yellow-500/10">
-              <iconify-icon icon="solar:idea-linear" className="text-yellow-200" width="20"></iconify-icon>
+              {/* Monthly Comparison Chart */}
+              {transactions.length > 0 && (
+                <div className="glass-card rounded-[28px] p-6 lg:p-8">
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <h3 className="text-sm font-medium text-white/90">Cash Flow Comparison</h3>
+                      <p className="text-xs text-white/40 mt-1">Income vs Expenses monthly</p>
+                    </div>
+                  </div>
+                  <MonthlyComparisonChart transactions={transactions} months={6} />
+                </div>
+              )}
             </div>
-            <div>
-              <h3 className="text-sm font-medium text-white/90 mb-1">Surplus detected</h3>
-              <p className="text-xs text-white/60 leading-relaxed mb-4">You have $200 more than usual. Consider moving it to your "Trip to Japan" goal.</p>
-              <button className="text-xs bg-white/10 hover:bg-white/15 active:scale-95 transition-all text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 w-fit">
-                Move to Goals
-                <iconify-icon icon="solar:arrow-right-linear" width="12"></iconify-icon>
+          </section>
+        </div>
+
+        {/* Right Column - Sidebar (4/12) */}
+        <div className="lg:col-span-4 mt-8 lg:mt-0 space-y-6 lg:space-y-8">
+
+          {/* 3. QUICK ACTIONS - Now Integrated & Responsive */}
+          <section className="glass-card rounded-[28px] p-6">
+            <h2 className="text-sm font-medium text-white/80 mb-6 px-1">Quick Actions</h2>
+            <div className="grid grid-cols-4 lg:grid-cols-2 gap-4">
+              <button className="flex flex-col items-center gap-2 group p-3 rounded-2xl hover:bg-white/[0.03] transition-all">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/10 group-hover:scale-110 transition-transform">
+                  <iconify-icon icon="solar:card-transfer-linear" width="24"></iconify-icon>
+                </div>
+                <span className="text-[10px] font-medium text-white/50">Transfer</span>
+              </button>
+              <button className="flex flex-col items-center gap-2 group p-3 rounded-2xl hover:bg-white/[0.03] transition-all">
+                <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/10 group-hover:scale-110 transition-transform">
+                  <iconify-icon icon="solar:bill-list-linear" width="24"></iconify-icon>
+                </div>
+                <span className="text-[10px] font-medium text-white/50">Add Bill</span>
+              </button>
+              <button className="flex flex-col items-center gap-2 group p-3 rounded-2xl hover:bg-white/[0.03] transition-all">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/10 group-hover:scale-110 transition-transform">
+                  <iconify-icon icon="solar:pie-chart-2-linear" width="24"></iconify-icon>
+                </div>
+                <span className="text-[10px] font-medium text-white/50">Budget</span>
+              </button>
+              <button className="flex flex-col items-center gap-2 group p-3 rounded-2xl hover:bg-white/[0.03] transition-all">
+                <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center text-yellow-400 border border-yellow-500/10 group-hover:scale-110 transition-transform">
+                  <iconify-icon icon="solar:target-linear" width="24"></iconify-icon>
+                </div>
+                <span className="text-[10px] font-medium text-white/50">Goals</span>
               </button>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* 6. QUICK ACTIONS */}
-        <section className="grid grid-cols-2 lg:grid-cols-1 gap-3 lg:gap-4 animate-fade-in delay-200">
-          <button className="flex flex-col items-center gap-2 group">
-            <div className="w-14 h-14 rounded-2xl glass-card flex items-center justify-center group-hover:bg-white/10 transition-colors">
-              <iconify-icon icon="solar:card-transfer-linear" className="text-emerald-300" width="24"></iconify-icon>
+          {/* 4. UPCOMING BILLS */}
+          <section className="space-y-4">
+            <div className="flex justify-between items-center px-1">
+              <h2 className="text-sm font-medium text-white/80">Upcoming Bills</h2>
+              <button className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">Calendar</button>
             </div>
-            <span className="text-[10px] font-medium text-white/50">Transfer</span>
-          </button>
-          <button className="flex flex-col items-center gap-2 group">
-            <div className="w-14 h-14 rounded-2xl glass-card flex items-center justify-center group-hover:bg-white/10 transition-colors">
-              <iconify-icon icon="solar:bill-list-linear" className="text-blue-300" width="24"></iconify-icon>
-            </div>
-            <span className="text-[10px] font-medium text-white/50">Add Bill</span>
-          </button>
-          <button className="flex flex-col items-center gap-2 group">
-            <div className="w-14 h-14 rounded-2xl glass-card flex items-center justify-center group-hover:bg-white/10 transition-colors">
-              <iconify-icon icon="solar:pie-chart-2-linear" className="text-purple-300" width="24"></iconify-icon>
-            </div>
-            <span className="text-[10px] font-medium text-white/50">Budget</span>
-          </button>
-          <button className="flex flex-col items-center gap-2 group">
-            <div className="w-14 h-14 rounded-2xl glass-card flex items-center justify-center group-hover:bg-white/10 transition-colors">
-              <iconify-icon icon="solar:target-linear" className="text-yellow-200" width="24"></iconify-icon>
-            </div>
-            <span className="text-[10px] lg:text-xs font-medium text-white/50">Goals</span>
-          </button>
-        </section>
-      </div>
-
-      {/* Desktop: Bottom Row with Bills and Charts */}
-      <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0 space-y-5">
-        {/* 5. UPCOMING BILLS */}
-        <section className="pt-2 animate-fade-in delay-300">
-          <div className="flex justify-between items-end mb-4 px-1">
-            <h2 className="text-sm font-medium text-white/80">Upcoming</h2>
-            <button className="text-xs text-emerald-400/80 hover:text-emerald-300 transition-colors">View Calendar</button>
-          </div>
-
-          <div className="space-y-3">
-            {upcomingBills.map((bill) => (
-              <div key={bill.id} className="glass-card rounded-2xl p-4 flex items-center justify-between group cursor-pointer hover:bg-white/5 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-black/40 border border-white/5 flex items-center justify-center text-white/80">
-                    <iconify-icon icon="solar:music-library-linear" width="20"></iconify-icon>
+            <div className="space-y-3">
+              {upcomingBills.length > 0 ? (
+                upcomingBills.map((bill) => (
+                  <div key={bill.id} className="glass-card rounded-2xl p-4 flex items-center justify-between group cursor-pointer hover:bg-white/[0.03] transition-colors border border-white/[0.02]">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/60">
+                        <iconify-icon icon="solar:bill-list-linear" width="20"></iconify-icon>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-white/90">{bill.name}</p>
+                        <p className="text-[10px] text-white/40 font-medium">Due in {bill.dueDate - now.getDate()} days</p>
+                      </div>
+                    </div>
+                    <p className="text-sm font-semibold text-white/90">-${bill.amount.toFixed(0)}</p>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-white/90">{bill.name}</p>
-                    <p className="text-xs text-white/40 mt-0.5">
-                      {bill.dueDate === now.getDate() ? 'Today' : `Oct ${bill.dueDate}`}
-                    </p>
-                  </div>
+                ))
+              ) : (
+                <div className="glass-card rounded-2xl p-6 text-center">
+                  <p className="text-xs text-white/40 font-medium">No bills for the next few days</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-white/90">-${bill.amount.toFixed(2)}</p>
+              )}
+            </div>
+          </section>
+
+          {/* 6. DISTRIBUTION CHART - Smaller in sidebar */}
+          {accounts.filter(a => !a.archived).length > 0 && (
+            <div className="space-y-6 lg:space-y-8">
+              <section className="glass-card rounded-[28px] p-6">
+                <h3 className="text-sm font-medium text-white/90 mb-6 px-1">Asset Allocation</h3>
+                <div className="h-64">
+                  <AccountBalanceChart accounts={accounts} transactions={transactions} />
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
+              </section>
 
-        {/* 7. CHARTS - Desktop: Show in grid, Mobile: Stack */}
-        <section className="lg:pt-2 pt-4 pb-4 space-y-5 animate-fade-in delay-300">
-          {/* Desktop: Charts in grid, Mobile: Stack */}
-          <div className="lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 space-y-5">
-            {/* Net Worth Chart */}
-            {accounts.filter(a => !a.archived).length > 0 && (
-              <div className="glass-card rounded-2xl p-5">
-                <h3 className="text-sm font-medium text-white/90 mb-4">Net Worth Trend (6 Months)</h3>
-                <NetWorthChart accounts={accounts} transactions={transactions} months={6} />
-              </div>
-            )}
+              <section className="glass-card rounded-[28px] p-6">
+                <h3 className="text-sm font-medium text-white/90 mb-6 px-1">Spending Categories</h3>
+                <div className="h-64">
+                  <CategoryPieChart transactions={transactions} type="expense" />
+                </div>
+              </section>
+            </div>
+          )}
 
-            {/* Account Balance Distribution */}
-            {accounts.filter(a => !a.archived).length > 0 && (
-              <div className="glass-card rounded-2xl p-5">
-                <h3 className="text-sm font-medium text-white/90 mb-4">Account Balance Distribution</h3>
-                <AccountBalanceChart accounts={accounts} transactions={transactions} />
+          {/* 5. NEXT MOVE / INSIGHT */}
+          <section className="glass-card rounded-[28px] p-6 relative overflow-hidden bg-gradient-to-br from-white/[0.03] to-transparent">
+            <div className="absolute right-[-10%] top-[-10%] w-24 h-24 bg-yellow-500/10 rounded-full blur-2xl"></div>
+            <div className="flex gap-4 relative z-10">
+              <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex-shrink-0 flex items-center justify-center border border-yellow-500/10">
+                <iconify-icon icon="solar:star-linear" className="text-yellow-400" width="20"></iconify-icon>
               </div>
-            )}
+              <div>
+                <h3 className="text-sm font-medium text-white/90 mb-1">Financial Tip</h3>
+                <p className="text-xs text-white/60 leading-relaxed mb-4">You have a $200 surplus. Moving it to "Emergency Fund" would reach your 3-month goal 2 weeks earlier.</p>
+                <button className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300 transition-colors">Apply Strategy</button>
+              </div>
+            </div>
+          </section>
 
-            {/* Monthly Comparison */}
-            {transactions.length > 0 && (
-              <div className="glass-card rounded-2xl p-5">
-                <h3 className="text-sm font-medium text-white/90 mb-4">Monthly Income vs Expenses</h3>
-                <MonthlyComparisonChart transactions={transactions} months={6} />
-              </div>
-            )}
-
-            {/* Spending Trend */}
-            {transactions.filter(t => t.type === 'expense').length > 0 && (
-              <div className="glass-card rounded-2xl p-5">
-                <h3 className="text-sm font-medium text-white/90 mb-4">Spending Trend (6 Months)</h3>
-                <SpendingTrendChart transactions={transactions} months={6} />
-              </div>
-            )}
-
-            {/* Category Breakdown */}
-            {transactions.filter(t => t.type === 'expense').length > 0 && (
-              <div className="glass-card rounded-2xl p-5">
-                <h3 className="text-sm font-medium text-white/90 mb-4">Spending by Category</h3>
-                <CategoryPieChart transactions={transactions} type="expense" />
-              </div>
-            )}
-          </div>
-        </section>
+        </div>
       </div>
     </div>
   );

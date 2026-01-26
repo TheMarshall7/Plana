@@ -41,7 +41,7 @@ function App() {
           <div className="fixed inset-0 pointer-events-none z-0">
             {/* Deep Emerald Core */}
             <div className="absolute inset-0 bg-gradient-to-b from-[#0F2922] via-[#081A14] to-[#020C09]"></div>
-            
+
             {/* Subtle Glows */}
             <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-900/20 rounded-full blur-[120px] mix-blend-screen opacity-40"></div>
             <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-900/10 rounded-full blur-[100px] mix-blend-screen opacity-30"></div>
@@ -49,24 +49,24 @@ function App() {
           </div>
 
           {/* Main App Container - Mobile: centered 420px, Desktop: full width */}
-          <main className="relative z-10 w-full max-w-[420px] lg:max-w-none mx-auto min-h-screen flex flex-col overflow-hidden">
+          <main className="relative z-10 w-full max-w-[420px] lg:max-w-none mx-auto min-h-screen flex flex-col">
             <Header />
-            <div className="flex-1 overflow-y-auto no-scrollbar pb-32 lg:pb-0 px-0">
+            <div className="flex-1 overflow-y-auto no-scrollbar pb-32 lg:pb-12 px-0">
               {/* Desktop Layout Container */}
-              <div className="hidden lg:flex lg:items-start lg:gap-8 lg:px-8 lg:py-6 lg:max-w-[1600px] lg:mx-auto lg:w-full">
+              <div className="hidden lg:flex lg:items-start lg:gap-8 lg:px-8 lg:py-6 lg:max-w-[1600px] lg:mx-auto lg:w-full min-h-0">
                 <Sidebar />
                 <div className="flex-1 min-w-0">
                   <Routes>
                     <Route path="/onboarding" element={<Onboarding />} />
-                    <Route 
-                      path="/" 
+                    <Route
+                      path="/"
                       element={
                         !settings.onboardingCompleted ? (
                           <Navigate to="/onboarding" replace />
                         ) : (
                           <Dashboard />
                         )
-                      } 
+                      }
                     />
                     <Route path="/transactions" element={<Transactions />} />
                     <Route path="/accounts" element={<Accounts />} />
@@ -84,15 +84,15 @@ function App() {
               <div className="lg:hidden w-full">
                 <Routes>
                   <Route path="/onboarding" element={<Onboarding />} />
-                  <Route 
-                    path="/" 
+                  <Route
+                    path="/"
                     element={
                       !settings.onboardingCompleted ? (
                         <Navigate to="/onboarding" replace />
                       ) : (
                         <Dashboard />
                       )
-                    } 
+                    }
                   />
                   <Route path="/transactions" element={<Transactions />} />
                   <Route path="/accounts" element={<Accounts />} />

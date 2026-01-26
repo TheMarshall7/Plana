@@ -5,13 +5,14 @@ interface PersonalizedGreetingProps {
 }
 
 export default function PersonalizedGreeting({ userName }: PersonalizedGreetingProps) {
-    const greeting = useMemo(() => {
+    const { greeting, icon, iconColor } = useMemo(() => {
         const hour = new Date().getHours();
 
-        if (hour < 12) return 'Good morning';
-        if (hour < 17) return 'Good afternoon';
-        if (hour < 21) return 'Good evening';
-        return 'Good night';
+        if (hour < 5) return { greeting: 'Good night', icon: 'solar:moon-linear', iconColor: 'text-indigo-300' };
+        if (hour < 12) return { greeting: 'Good morning', icon: 'solar:sun-2-linear', iconColor: 'text-amber-300' };
+        if (hour < 17) return { greeting: 'Good afternoon', icon: 'solar:sun-fog-linear', iconColor: 'text-orange-300' };
+        if (hour < 21) return { greeting: 'Good evening', icon: 'solar:sunset-linear', iconColor: 'text-rose-300' };
+        return { greeting: 'Good night', icon: 'solar:moon-linear', iconColor: 'text-indigo-300' };
     }, []);
 
     const displayName = userName || 'there';
@@ -29,11 +30,16 @@ export default function PersonalizedGreeting({ userName }: PersonalizedGreetingP
     }, []);
 
     return (
-        <div className="mb-6 animate-fade-in">
-            <h1 className="text-2xl lg:text-3xl font-semibold text-white/95 mb-1">
-                {greeting}, {displayName}
-            </h1>
-            <p className="text-sm text-white/50">{randomMessage}</p>
+        <div className="mb-6 animate-fade-in flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-2xl glass-card flex items-center justify-center ${iconColor} border border-white/5`}>
+                <iconify-icon icon={icon} width="24"></iconify-icon>
+            </div>
+            <div>
+                <h1 className="text-2xl lg:text-3xl font-semibold text-white/95 mb-0.5">
+                    {greeting}, {displayName}
+                </h1>
+                <p className="text-sm text-white/50">{randomMessage}</p>
+            </div>
         </div>
     );
 }
