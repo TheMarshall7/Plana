@@ -15,7 +15,7 @@ export default function Header() {
         <button className="w-10 h-10 lg:w-12 lg:h-12 rounded-full hover:bg-white/5 flex items-center justify-center transition-colors">
           <iconify-icon icon="solar:bell-linear" className="text-white/70" width="22"></iconify-icon>
         </button>
-        <div className="hidden lg:block">
+        <div className="">
           <UserSelector />
         </div>
       </div>

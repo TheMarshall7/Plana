@@ -66,12 +66,41 @@ export default function Settings() {
     <div className="px-5 lg:px-0 py-8 space-y-5 lg:space-y-6">
       <h1 className="text-2xl font-semibold text-white/90 mb-6">Settings</h1>
 
-      {/* Preferences */}
+      {/* Profile Selection */}
       <div className="glass-card rounded-2xl p-4 space-y-4">
-        <h2 className="text-sm font-medium text-white/90">Preferences</h2>
+        <h2 className="text-sm font-medium text-white/90">Active Profile</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {users.map((user) => (
+            <button
+              key={user.id}
+              onClick={() => {
+                const store = useStore.getState();
+                store.setActiveUser(user.id);
+                store.addToast(`Switched to ${user.name}'s profile`, 'info');
+              }}
+              className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${activeUserId === user.id
+                  ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400'
+                  : 'bg-white/5 border-white/5 text-white/60 hover:bg-white/10'
+                }`}
+            >
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                style={{ backgroundColor: user.color }}
+              >
+                {user.name.charAt(0)}
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-medium">{user.name}</p>
+                {activeUserId === user.id && (
+                  <p className="text-[10px] opacity-70">Active</p>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
 
-        <div>
-          <label className="block text-sm font-medium text-white/70 mb-1">Your Name</label>
+        <div className="pt-2">
+          <label className="block text-sm font-medium text-white/70 mb-1">Display Name</label>
           <input
             type="text"
             value={activeUser.name}
@@ -79,8 +108,12 @@ export default function Settings() {
             placeholder="e.g., Brian Lewis"
             className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-emerald-500/50"
           />
-          <p className="text-xs text-white/40 mt-1">Updating your profile name ({activeUserId})</p>
         </div>
+      </div>
+
+      {/* Preferences */}
+      <div className="glass-card rounded-2xl p-4 space-y-4">
+        <h2 className="text-sm font-medium text-white/90">Preferences</h2>
 
         <div className="flex items-center justify-between">
           <div>
