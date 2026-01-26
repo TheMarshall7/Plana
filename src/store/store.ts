@@ -5,6 +5,33 @@ import type { AppState, Account, Transaction, Subscription, Goal, Debt, Settings
 // Custom storage to sync with local file system via Vite dev server
 const apiStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
+    // 1. Try Supabase Cloud Sync first
+    try {
+      const localData = localStorage.getItem(name);
+      if (localData) {
+        const state = JSON.parse(localData);
+        const { supabaseUrl, supabaseKey } = state.state.settings || {};
+
+        if (supabaseUrl && supabaseKey) {
+          const response = await fetch(`${supabaseUrl}/rest/v1/user_data?select=data&limit=1`, {
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`
+            }
+          });
+          if (response.ok) {
+            const result = await response.json();
+            if (result && result.length > 0) {
+              return JSON.stringify(result[0].data);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Supabase sync failed, falling back to local storage');
+    }
+
+    // 2. Fallback to Local Repo DB
     try {
       const response = await fetch('/api/data');
       if (response.ok) {
@@ -17,6 +44,8 @@ const apiStorage: StateStorage = {
   },
   setItem: async (name: string, value: string): Promise<void> => {
     localStorage.setItem(name, value);
+
+    // 1. Sync to Local Repo DB
     try {
       await fetch('/api/data', {
         method: 'POST',
@@ -25,6 +54,32 @@ const apiStorage: StateStorage = {
       });
     } catch (error) {
       console.error('Failed to sync with backend');
+    }
+
+    // 2. Sync to Supabase Cloud
+    try {
+      const state = JSON.parse(value);
+      const { supabaseUrl, supabaseKey } = state.state.settings || {};
+
+      if (supabaseUrl && supabaseKey) {
+        // Upsert data to a 'user_data' table
+        // We assume ID 'primary' for simplicity in this single-user app
+        await fetch(`${supabaseUrl}/rest/v1/user_data?id=eq.primary`, {
+          method: 'POST',
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify({
+            id: 'primary',
+            data: state
+          }),
+        });
+      }
+    } catch (error) {
+      console.warn('Cloud sync failed');
     }
   },
   removeItem: (name: string): void => {
@@ -59,13 +114,10 @@ const seedSettings: Settings = {
 export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
-      accounts: seedAccounts,
-      transactions: seedTransactions,
+      accounts: [],
+      transactions: [],
       budgets: [],
-      subscriptions: [
-        { id: '1', name: 'Spotify Premium', amount: 12.99, cadence: 'monthly', dueDate: 26, category: 'Entertainment', accountId: '1' },
-        { id: '2', name: 'Internet', amount: 85, cadence: 'monthly', dueDate: 24, category: 'Bills', accountId: '1' },
-      ],
+      subscriptions: [],
       goals: [],
       debts: [],
       couples: { enabled: false, funMoneyAmount: 0, jointSpendingThreshold: 0 },
@@ -258,14 +310,17 @@ export const useStore = create<AppState>()(
 
       // Utilities
       getAccountBalance: (accountId) => {
-        const account = get().accounts.find((a) => a.id === accountId);
-        return account?.balance || 0;
+        const state = get();
+        const account = state.accounts.find((a) => a.id === accountId);
+        if (!account) return 0;
+        const accountTransactions = state.transactions.filter(t => t.accountId === accountId);
+        return account.balance + accountTransactions.reduce((sum, t) => sum + t.amount, 0);
       },
 
       getSafeToSpend: () => {
-        const { accounts, subscriptions } = get();
+        const { accounts, subscriptions, getAccountBalance } = get();
         const checkingAccounts = accounts.filter((a) => a.type === 'checking' && !a.archived);
-        const totalCash = checkingAccounts.reduce((sum, acc) => sum + acc.balance, 0);
+        const totalCash = checkingAccounts.reduce((sum, acc) => sum + getAccountBalance(acc.id), 0);
 
         // Calculate upcoming bills
         const now = new Date();
@@ -285,6 +340,9 @@ export const useStore = create<AppState>()(
           subscriptions: state.subscriptions,
           goals: state.goals,
           debts: state.debts,
+          trips: state.trips,
+          couples: state.couples,
+          settings: state.settings,
         }, null, 2);
       },
 
@@ -298,6 +356,9 @@ export const useStore = create<AppState>()(
             subscriptions: imported.subscriptions || [],
             goals: imported.goals || [],
             debts: imported.debts || [],
+            trips: imported.trips || [],
+            couples: imported.couples || { enabled: false, funMoneyAmount: 0, jointSpendingThreshold: 0 },
+            settings: imported.settings || seedSettings,
           });
         } catch (error) {
           console.error('Failed to import data:', error);

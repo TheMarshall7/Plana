@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useStore } from '../store/store';
 import Modal from '../components/Modal';
-import type { CouplesSettings } from '../store/types';
+import type { CouplesSettings, Account, Transaction } from '../store/types';
 
 export default function Couples() {
-  const { couples, updateCouples, transactions } = useStore();
+  const { couples, updateCouples, transactions, accounts, getAccountBalance } = useStore();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleSaveSettings = (data: Partial<CouplesSettings>) => {
@@ -16,36 +16,66 @@ export default function Couples() {
   const monthlySettlement = () => {
     if (!couples.enabled) return null;
 
-    const thisMonth = new Date().getMonth();
-    const thisYear = new Date().getFullYear();
-    
-    const monthTransactions = transactions.filter(t => {
+    const now = new Date();
+    const thisMonth = now.getMonth();
+    const thisYear = now.getFullYear();
+
+    // Filter transactions for joint accounts OR marked as paidBy a member
+    const monthTransactions = transactions.filter((t: Transaction) => {
       const tDate = new Date(t.date);
-      return tDate.getMonth() === thisMonth && tDate.getFullYear() === thisYear;
+      const isThisMonth = tDate.getMonth() === thisMonth && tDate.getFullYear() === thisYear;
+      if (!isThisMonth) return false;
+
+      const account = accounts.find((a: Account) => a.id === t.accountId);
+      return account?.ownership === 'joint' || t.paidBy;
     });
 
-    const member1Expenses = monthTransactions
-      .filter(t => t.coupleMemberId === '1' && t.type === 'expense')
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    const brianExpenses = monthTransactions
+      .filter((t: Transaction) => t.paidBy === 'brian' && t.type === 'expense')
+      .reduce((sum: number, t: Transaction) => sum + Math.abs(t.amount), 0);
 
-    const member2Expenses = monthTransactions
-      .filter(t => t.coupleMemberId === '2' && t.type === 'expense')
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    const nadineExpenses = monthTransactions
+      .filter((t: Transaction) => t.paidBy === 'nadine' && t.type === 'expense')
+      .reduce((sum: number, t: Transaction) => sum + Math.abs(t.amount), 0);
 
-    const totalExpenses = member1Expenses + member2Expenses;
-    const averageExpense = totalExpenses / 2;
-    const settlement = member1Expenses - averageExpense;
+    const totalJointExpenses = brianExpenses + nadineExpenses;
+    const sharePerPerson = totalJointExpenses / 2;
+
+    // If Brian spent more than his share, Nadine owes him the difference
+    const settlementAmount = brianExpenses - sharePerPerson;
 
     return {
-      member1Expenses,
-      member2Expenses,
-      totalExpenses,
-      averageExpense,
-      settlement,
+      brianExpenses,
+      nadineExpenses,
+      totalJointExpenses,
+      sharePerPerson,
+      settlementAmount,
     };
   };
 
   const settlement = monthlySettlement();
+
+  // Fun Money Calculation
+  const getFunMoney = (member: 'brian' | 'nadine') => {
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const personalExpenses = transactions
+      .filter((t: Transaction) => {
+        const tDate = new Date(t.date);
+        const account = accounts.find((a: Account) => a.id === t.accountId);
+        return tDate >= monthStart &&
+          t.paidBy === member &&
+          t.type === 'expense' &&
+          account?.ownership !== 'joint';
+      })
+      .reduce((sum: number, t: Transaction) => sum + Math.abs(t.amount), 0);
+
+    return Math.max(0, couples.funMoneyAmount - personalExpenses);
+  };
+
+  const brianFunMoney = getFunMoney('brian');
+  const nadineFunMoney = getFunMoney('nadine');
 
   return (
     <div className="px-5 lg:px-0 py-8 space-y-5 lg:space-y-6">
@@ -53,7 +83,7 @@ export default function Couples() {
         <h1 className="text-2xl font-semibold text-white/90">Couples</h1>
         <button
           onClick={() => setIsSettingsOpen(true)}
-          className="px-4 py-2 btn-primary text-white rounded-lg font-medium flex items-center gap-2"
+          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg font-medium transition-all flex items-center gap-2"
         >
           <iconify-icon icon="solar:settings-linear" width="20"></iconify-icon>
           Settings
@@ -61,99 +91,136 @@ export default function Couples() {
       </div>
 
       {!couples.enabled ? (
-        <div className="glass-card rounded-2xl p-8 text-center">
-          <iconify-icon icon="solar:heart-linear" className="text-emerald-400 mx-auto mb-4" width="48"></iconify-icon>
-          <h2 className="text-lg font-semibold text-white/90 mb-2">Couples Mode Disabled</h2>
-          <p className="text-white/60 mb-6">
-            Enable couples mode to track shared finances, split transactions, and manage joint spending.
+        <div className="glass-card rounded-[32px] p-12 text-center max-w-lg mx-auto mt-12">
+          <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-6">
+            <iconify-icon icon="solar:heart-bold" className="text-emerald-400" width="40"></iconify-icon>
+          </div>
+          <h2 className="text-2xl font-semibold text-white/90 mb-3">Finance for Two</h2>
+          <p className="text-white/60 mb-8">
+            Manage your joint expenses, split your monthly rent, and track personal "fun money" automatically.
           </p>
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg font-medium transition-colors"
+            className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-white rounded-2xl font-bold text-lg transition-all shadow-lg shadow-emerald-500/20"
           >
             Enable Couples Mode
           </button>
         </div>
       ) : (
-        <>
-          {/* Summary Cards */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="glass-card rounded-2xl p-4">
-              <p className="text-xs text-white/50 mb-1">Fun Money (Each)</p>
-              <p className="text-lg font-semibold text-white/90">${couples.funMoneyAmount.toLocaleString()}</p>
-            </div>
-            <div className="glass-card rounded-2xl p-4">
-              <p className="text-xs text-white/50 mb-1">Joint Threshold</p>
-              <p className="text-lg font-semibold text-white/90">${couples.jointSpendingThreshold.toLocaleString()}</p>
-            </div>
-          </div>
+        <div className="space-y-6 lg:space-y-8 animate-fade-in">
 
-          {/* Monthly Settlement */}
+          {/* 1. Settlement Visualization */}
           {settlement && (
-            <div className="glass-card rounded-2xl p-4">
-              <p className="text-sm font-medium text-white/90 mb-3">Monthly Settlement</p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-white/60">Member 1 Expenses</span>
-                  <span className="text-sm font-medium text-white/90">${settlement.member1Expenses.toFixed(2)}</span>
+            <div className="glass-card rounded-[32px] p-8 lg:p-10 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                <iconify-icon icon="solar:hand-money-bold" width="64"></iconify-icon>
+              </div>
+
+              <h3 className="text-lg font-semibold text-white/90 mb-6 flex items-center gap-2">
+                <iconify-icon icon="solar:calendar-split-linear" className="text-emerald-400"></iconify-icon>
+                Monthly Settlement
+              </h3>
+
+              <div className="grid lg:grid-cols-2 gap-10 items-center">
+                <div className="space-y-6">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-white/60">Brian: ${settlement.brianExpenses.toLocaleString()}</span>
+                    <span className="text-white/60">Nadine: ${settlement.nadineExpenses.toLocaleString()}</span>
+                  </div>
+                  <div className="w-full h-4 bg-white/5 rounded-full overflow-hidden flex">
+                    <div
+                      className="h-full bg-emerald-500 transition-all duration-700"
+                      style={{ width: `${(settlement.brianExpenses / Math.max(1, settlement.totalJointExpenses)) * 100}%` }}
+                    ></div>
+                    <div
+                      className="h-full bg-white/10 transition-all duration-700"
+                      style={{ width: `${(settlement.nadineExpenses / Math.max(1, settlement.totalJointExpenses)) * 100}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-white/40 text-center">Joint Spending Split (% of total paid)</p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-white/60">Member 2 Expenses</span>
-                  <span className="text-sm font-medium text-white/90">${settlement.member2Expenses.toFixed(2)}</span>
-                </div>
-                <div className="border-t border-white/10 pt-2 flex items-center justify-between">
-                  <span className="text-sm font-medium text-white/90">Settlement Amount</span>
-                  <span className={`text-sm font-semibold ${
-                    settlement.settlement >= 0 ? 'text-emerald-400' : 'text-red-400'
-                  }`}>
-                    {settlement.settlement >= 0 ? 'Member 1 owes' : 'Member 2 owes'} ${Math.abs(settlement.settlement).toFixed(2)}
-                  </span>
+
+                <div className="bg-white/5 rounded-2xl p-6 text-center lg:text-left">
+                  <p className="text-sm text-white/60 mb-1">Settlement Status</p>
+                  <p className={`text-2xl font-bold ${settlement.settlementAmount >= 0 ? 'text-emerald-400' : 'text-blue-400'}`}>
+                    {settlement.settlementAmount >= 0 ? 'Nadine owes Brian' : 'Brian owes Nadine'}
+                  </p>
+                  <p className="text-3xl font-black text-white mt-1">
+                    ${Math.abs(settlement.settlementAmount).toLocaleString()}
+                  </p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Check-in Info */}
-          {couples.checkInFrequency && (
-            <div className="glass-card rounded-2xl p-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-white/90">Check-in Schedule</p>
-                <span className="text-xs text-emerald-400 capitalize">{couples.checkInFrequency}</span>
+          {/* 2. Fun Money (Personal Allowances) */}
+          <div className="grid lg:grid-cols-2 gap-6">
+            <div className="glass-card rounded-[24px] p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">B</div>
+                  <div>
+                    <p className="text-sm font-semibold text-white/90">Brian's Fun Money</p>
+                    <p className="text-xs text-white/40">Personal Allowance</p>
+                  </div>
+                </div>
+                <span className="text-xl font-bold text-white">${brianFunMoney.toLocaleString()}</span>
               </div>
-              {couples.lastCheckIn && (
-                <p className="text-xs text-white/60">
-                  Last check-in: {new Date(couples.lastCheckIn).toLocaleDateString()}
-                </p>
-              )}
-              <button className="mt-3 px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-lg text-xs font-medium transition-colors">
-                Mark Check-in Complete
-              </button>
+              <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 transition-all duration-1000"
+                  style={{ width: `${(brianFunMoney / Math.max(1, couples.funMoneyAmount)) * 100}%` }}
+                ></div>
+              </div>
             </div>
-          )}
 
-          {/* Features Info */}
-          <div className="glass-card rounded-2xl p-4">
-            <p className="text-sm font-medium text-white/90 mb-3">Available Features</p>
-            <div className="space-y-2 text-xs text-white/60">
-              <div className="flex items-center gap-2">
-                <iconify-icon icon="solar:check-circle-linear" className="text-emerald-400" width="16"></iconify-icon>
-                <span>Transaction splitting (equal, custom, by member)</span>
+            <div className="glass-card rounded-[24px] p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold">N</div>
+                  <div>
+                    <p className="text-sm font-semibold text-white/90">Nadine's Fun Money</p>
+                    <p className="text-xs text-white/40">Personal Allowance</p>
+                  </div>
+                </div>
+                <span className="text-xl font-bold text-white">${nadineFunMoney.toLocaleString()}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <iconify-icon icon="solar:check-circle-linear" className="text-emerald-400" width="16"></iconify-icon>
-                <span>Shared account management</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <iconify-icon icon="solar:check-circle-linear" className="text-emerald-400" width="16"></iconify-icon>
-                <span>Monthly settlement calculations</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <iconify-icon icon="solar:check-circle-linear" className="text-emerald-400" width="16"></iconify-icon>
-                <span>Bill confirmation system</span>
+              <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-400 transition-all duration-1000"
+                  style={{ width: `${(nadineFunMoney / Math.max(1, couples.funMoneyAmount)) * 100}%` }}
+                ></div>
               </div>
             </div>
           </div>
-        </>
+
+          {/* 3. Joint Accounts Quick View */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-white/40 uppercase tracking-widest pl-1">Joint Accounts</h3>
+            <div className="grid gap-3">
+              {accounts.filter((a: Account) => a.ownership === 'joint').map((acc: Account) => (
+                <div key={acc.id} className="glass-card rounded-2xl p-5 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                      <iconify-icon icon="solar:card-linear" className="text-white/60" width="24"></iconify-icon>
+                    </div>
+                    <div>
+                      <p className="font-medium text-white/90">{acc.name}</p>
+                      <p className="text-xs text-white/40">{acc.institution}</p>
+                    </div>
+                  </div>
+                  <p className="text-lg font-bold text-white">${getAccountBalance(acc.id).toLocaleString()}</p>
+                </div>
+              ))}
+              {accounts.filter((a: Account) => a.ownership === 'joint').length === 0 && (
+                <div className="glass-card rounded-2xl p-8 text-center text-white/40 text-sm">
+                  Assign "Joint" ownership to accounts to see them here.
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
       )}
 
       {/* Settings Modal */}
@@ -259,7 +326,7 @@ function CouplesSettingsModal({ isOpen, onClose, settings, onSave }: CouplesSett
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 px-4 py-2 btn-secondary text-white rounded-lg font-medium"
+            className="flex-1 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg font-medium transition-colors"
           >
             Cancel
           </button>

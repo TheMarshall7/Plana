@@ -7,14 +7,14 @@ import CategoryPieChart from '../components/charts/CategoryPieChart';
 import PersonalizedGreeting from '../components/PersonalizedGreeting';
 
 export default function Dashboard() {
-  const { getSafeToSpend, accounts, subscriptions, transactions, addToast, users, activeUserId } = useStore();
+  const { getSafeToSpend, accounts, subscriptions, transactions, addToast, users, activeUserId, getAccountBalance } = useStore();
   const activeUser = users.find(u => u.id === activeUserId) || users[0];
   const safeToSpend = getSafeToSpend();
 
   // Calculate KPIs
   const totalCash = accounts
     .filter(a => (a.type === 'checking' || a.type === 'savings') && !a.archived)
-    .reduce((sum, a) => sum + a.balance, 0);
+    .reduce((sum, a) => sum + getAccountBalance(a.id), 0);
 
   const monthlyIncome = transactions
     .filter(t => t.type === 'income')

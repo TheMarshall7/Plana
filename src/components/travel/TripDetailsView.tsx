@@ -24,6 +24,7 @@ export default function TripDetailsView() {
 
     const tripTransactions = transactions.filter(t => t.tripId === trip.id);
     const totalSpent = tripTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    const totalPlanned = trip.itinerary.reduce((sum, item) => sum + (item.cost || 0), 0);
     const remainingBudget = trip.budget - totalSpent;
 
     // Group itinerary by date
@@ -103,8 +104,8 @@ export default function TripDetailsView() {
                     </p>
                 </div>
                 <div className="glass-card rounded-[24px] p-5">
-                    <p className="text-[10px] uppercase tracking-wider text-white/40 font-bold mb-2">Planned Logic</p>
-                    <p className="text-xl font-semibold text-white/90">{trip.itinerary.length} items</p>
+                    <p className="text-[10px] uppercase tracking-wider text-white/40 font-bold mb-2">Planned Costs</p>
+                    <p className="text-xl font-semibold text-white/90">${totalPlanned.toLocaleString()}</p>
                 </div>
             </div>
 

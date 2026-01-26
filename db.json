@@ -1,0 +1,44 @@
+{
+    "state": {
+        "accounts": [],
+        "transactions": [],
+        "budgets": [],
+        "subscriptions": [],
+        "goals": [],
+        "debts": [],
+        "couples": {
+            "enabled": false,
+            "funMoneyAmount": 0,
+            "jointSpendingThreshold": 0
+        },
+        "settings": {
+            "guidedMode": false,
+            "beginnerMode": false,
+            "theme": "dark",
+            "currency": "USD",
+            "dateFormat": "MM/DD/YYYY",
+            "payoffStrategy": "snowball",
+            "onboardingCompleted": true,
+            "seedData": false,
+            "supabaseUrl": "https://evlnjtakkvwlxxspmelt.supabase.co",
+            "supabaseKey": "sb_publishable_y5TS3jCVKls-LjaZbk-tNA_QXtx7b55"
+        },
+        "trips": [],
+        "users": [
+            {
+                "id": "brian",
+                "name": "Brian",
+                "avatar": "/avatars/brian.png",
+                "color": "#10b981"
+            },
+            {
+                "id": "nadine",
+                "name": "Nadine",
+                "avatar": "/avatars/nadine.png",
+                "color": "#8b5cf6"
+            }
+        ],
+        "activeUserId": "brian"
+    },
+    "version": 1
+}

@@ -303,6 +303,7 @@ function AccountModal({ isOpen, onClose, account, onSave }: AccountModalProps) {
     institution: account?.institution || '',
     integrationType: account?.integrationType || '',
     integrationId: account?.integrationId || '',
+    ownership: account?.ownership || 'joint',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -315,6 +316,7 @@ function AccountModal({ isOpen, onClose, account, onSave }: AccountModalProps) {
       institution: formData.institution || undefined,
       integrationType: (formData.integrationType as 'paypal' | 'stripe' | 'gohighlevel' | undefined) || undefined,
       integrationId: formData.integrationId || undefined,
+      ownership: formData.ownership as 'brian' | 'nadine' | 'joint',
       archived: false,
     });
   };
@@ -372,6 +374,25 @@ function AccountModal({ isOpen, onClose, account, onSave }: AccountModalProps) {
                   }`}
                 style={{ backgroundColor: color }}
               />
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-white/70 mb-1">Ownership</label>
+          <div className="grid grid-cols-3 gap-2">
+            {['brian', 'nadine', 'joint'].map((owner) => (
+              <button
+                key={owner}
+                type="button"
+                onClick={() => setFormData({ ...formData, ownership: owner as any })}
+                className={`py-2 px-3 rounded-lg border text-sm font-medium capitalize transition-all ${formData.ownership === owner
+                  ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
+                  : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                  }`}
+              >
+                {owner}
+              </button>
             ))}
           </div>
         </div>

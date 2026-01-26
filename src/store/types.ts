@@ -19,6 +19,7 @@ export interface Account {
   archived: boolean;
   integrationId?: string;
   integrationType?: 'paypal' | 'stripe' | 'gohighlevel';
+  ownership?: 'brian' | 'nadine' | 'joint';
 }
 
 // Transaction Types
@@ -38,6 +39,7 @@ export interface Transaction {
   splitTransactionId?: string;
   coupleMemberId?: string;
   tripId?: string;
+  paidBy?: 'brian' | 'nadine';
 }
 
 // Travel Types
@@ -137,6 +139,8 @@ export interface Settings {
   payoffStrategy: 'snowball' | 'avalanche';
   onboardingCompleted: boolean;
   seedData: boolean;
+  supabaseUrl?: string;
+  supabaseKey?: string;
 }
 
 // Toast

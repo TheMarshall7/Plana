@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import CloudSyncIndicator from './CloudSyncIndicator';
 
 export default function Sidebar() {
   const location = useLocation();
@@ -41,6 +42,10 @@ export default function Sidebar() {
               <span className="text-sm font-medium">{item.label}</span>
             </Link>
           ))}
+        </div>
+
+        <div className="mt-8">
+          <CloudSyncIndicator />
         </div>
       </div>
     </aside>

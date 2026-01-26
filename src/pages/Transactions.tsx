@@ -276,7 +276,17 @@ export default function Transactions() {
                     />
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="text-sm font-medium text-white/90">{transaction.description}</p>
+                        <p className="text-sm font-medium text-white/90 leading-tight mb-1">{transaction.description}</p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] text-white/40 font-medium uppercase tracking-wider">{transaction.category}</span>
+                          {transaction.paidBy && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-tighter bg-white/10 text-white/50">
+                              {transaction.paidBy}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
                         <p className={`text-sm font-semibold ${isIncome ? 'text-emerald-400' : isExpense ? 'text-red-400' : 'text-white/70'}`}>
                           {isIncome ? '+' : isExpense ? '-' : ''}${Math.abs(transaction.amount).toLocaleString()}
                         </p>
@@ -357,6 +367,7 @@ function TransactionModal({ isOpen, onClose, transaction, accounts, onSave }: Tr
     description: transaction?.description || '',
     date: transaction?.date || format(new Date(), 'yyyy-MM-dd'),
     notes: transaction?.notes || '',
+    paidBy: transaction?.paidBy || 'brian',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -372,6 +383,7 @@ function TransactionModal({ isOpen, onClose, transaction, accounts, onSave }: Tr
       description: formData.description,
       date: formData.date,
       notes: formData.notes || undefined,
+      paidBy: formData.paidBy as 'brian' | 'nadine',
     });
   };
 
@@ -454,6 +466,25 @@ function TransactionModal({ isOpen, onClose, transaction, accounts, onSave }: Tr
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-white/70 mb-1">Paid By</label>
+          <div className="grid grid-cols-2 gap-2">
+            {['brian', 'nadine'].map((member) => (
+              <button
+                key={member}
+                type="button"
+                onClick={() => setFormData({ ...formData, paidBy: member as any })}
+                className={`py-2 px-3 rounded-lg border text-sm font-medium capitalize transition-all ${formData.paidBy === member
+                  ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
+                  : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                  }`}
+              >
+                {member}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div>

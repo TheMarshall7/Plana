@@ -179,6 +179,47 @@ export default function Settings() {
         </div>
       </div>
 
+      {/* Cloud Sync */}
+      <div className="glass-card rounded-2xl p-4 space-y-4">
+        <div className="flex items-center gap-2">
+          <iconify-icon icon="solar:cloud-upload-linear" className="text-emerald-400" width="20"></iconify-icon>
+          <h2 className="text-sm font-medium text-white/90">Cloud Sync (Any Device)</h2>
+        </div>
+
+        <p className="text-xs text-white/60">
+          Enter your Supabase credentials to sync your data across all your devices instantly.
+        </p>
+
+        <div>
+          <label className="block text-sm font-medium text-white/70 mb-1">Supabase URL</label>
+          <input
+            type="text"
+            value={settings.supabaseUrl || ''}
+            onChange={(e) => updateSettings({ supabaseUrl: e.target.value })}
+            placeholder="https://your-project.supabase.co"
+            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-emerald-500/50"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-white/70 mb-1">Supabase API Key (anon)</label>
+          <input
+            type="password"
+            value={settings.supabaseKey || ''}
+            onChange={(e) => updateSettings({ supabaseKey: e.target.value })}
+            placeholder="your-anon-key"
+            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-emerald-500/50"
+          />
+        </div>
+
+        {settings.supabaseUrl && settings.supabaseKey && (
+          <div className="p-3 bg-emerald-500/10 rounded-lg flex items-center gap-2">
+            <iconify-icon icon="solar:check-circle-bold" className="text-emerald-400" width="16"></iconify-icon>
+            <span className="text-xs text-emerald-400 font-medium">Cloud sync configuration active</span>
+          </div>
+        )}
+      </div>
+
       {/* Data Management */}
       <div className="glass-card rounded-2xl p-4 space-y-3">
         <h2 className="text-sm font-medium text-white/90">Data Management</h2>
