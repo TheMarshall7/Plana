@@ -18,7 +18,7 @@ export default function NetWorthChart({ accounts, transactions, months = 6 }: Ne
     return monthRange.map(month => {
       const monthStart = startOfMonth(month);
       const monthEnd = startOfMonth(subMonths(month, -1));
-      
+
       const monthTransactions = transactions.filter(t => {
         const tDate = parseISO(t.date);
         return tDate >= monthStart && tDate < monthEnd;
@@ -43,41 +43,77 @@ export default function NetWorthChart({ accounts, transactions, months = 6 }: Ne
   return (
     <div className="w-full h-64 lg:h-80">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={chartData}>
+        <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="colorNetWorth" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-              <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+              <stop offset="0%" stopColor="#10b981" stopOpacity={0.4} />
+              <stop offset="50%" stopColor="#10b981" stopOpacity={0.2} />
+              <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
             </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-          <XAxis 
-            dataKey="month" 
-            stroke="rgba(255,255,255,0.5)"
-            style={{ fontSize: '10px' }}
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="rgba(255,255,255,0.05)"
+            vertical={false}
           />
-          <YAxis 
-            stroke="rgba(255,255,255,0.5)"
-            style={{ fontSize: '10px' }}
+          <XAxis
+            dataKey="month"
+            stroke="rgba(255,255,255,0.4)"
+            tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }}
+            tickLine={false}
+            axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
           />
-          <Tooltip 
-            contentStyle={{ 
-              backgroundColor: 'rgba(0,0,0,0.8)', 
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '8px',
+          <YAxis
+            stroke="rgba(255,255,255,0.4)"
+            tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }}
+            tickLine={false}
+            axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: 'rgba(15, 23, 42, 0.95)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(16, 185, 129, 0.2)',
+              borderRadius: '12px',
+              padding: '12px 16px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
               color: '#fff'
             }}
-            formatter={(value: number) => `$${value.toLocaleString()}`}
+            labelStyle={{
+              color: 'rgba(255,255,255,0.7)',
+              fontSize: '12px',
+              marginBottom: '4px'
+            }}
+            itemStyle={{
+              color: '#10b981',
+              fontSize: '14px',
+              fontWeight: '600'
+            }}
+            formatter={(value: number) => [`$${value.toLocaleString()}`, 'Net Worth']}
+            cursor={{ stroke: 'rgba(16, 185, 129, 0.2)', strokeWidth: 2 }}
           />
-          <Area 
-            type="monotone" 
-            dataKey="netWorth" 
-            stroke="#10b981" 
+          <Area
+            type="monotone"
+            dataKey="netWorth"
+            stroke="#10b981"
+            strokeWidth={3}
             fillOpacity={1}
             fill="url(#colorNetWorth)"
+            filter="url(#glow)"
+            animationDuration={1000}
+            animationEasing="ease-in-out"
           />
         </AreaChart>
       </ResponsiveContainer>
     </div>
   );
 }
+

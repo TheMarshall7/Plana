@@ -17,7 +17,7 @@ export default function SpendingTrendChart({ transactions, months = 6 }: Spendin
     return monthRange.map(month => {
       const monthStart = startOfMonth(month);
       const monthEnd = startOfMonth(subMonths(month, -1));
-      
+
       const monthTransactions = transactions.filter(t => {
         const tDate = parseISO(t.date);
         return tDate >= monthStart && tDate < monthEnd;
@@ -34,39 +34,106 @@ export default function SpendingTrendChart({ transactions, months = 6 }: Spendin
     });
   }, [transactions, months]);
 
+  const CustomDot = (props: any) => {
+    const { cx, cy } = props;
+
+    return (
+      <g>
+        <circle
+          cx={cx}
+          cy={cy}
+          r={6}
+          fill="#ef4444"
+          stroke="#fff"
+          strokeWidth={2}
+          opacity={0.9}
+        />
+        <circle
+          cx={cx}
+          cy={cy}
+          r={10}
+          fill="#ef4444"
+          opacity={0.2}
+        />
+      </g>
+    );
+  };
+
   return (
     <div className="w-full h-64 lg:h-80">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-          <XAxis 
-            dataKey="month" 
-            stroke="rgba(255,255,255,0.5)"
-            style={{ fontSize: '10px' }}
+        <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+          <defs>
+            <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#ef4444" stopOpacity={0.8} />
+              <stop offset="50%" stopColor="#f97316" stopOpacity={0.9} />
+              <stop offset="100%" stopColor="#ef4444" stopOpacity={0.8} />
+            </linearGradient>
+            <filter id="lineGlow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="rgba(255,255,255,0.05)"
+            vertical={false}
           />
-          <YAxis 
-            stroke="rgba(255,255,255,0.5)"
-            style={{ fontSize: '10px' }}
+          <XAxis
+            dataKey="month"
+            stroke="rgba(255,255,255,0.4)"
+            tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }}
+            tickLine={false}
+            axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
           />
-          <Tooltip 
-            contentStyle={{ 
-              backgroundColor: 'rgba(0,0,0,0.8)', 
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '8px',
+          <YAxis
+            stroke="rgba(255,255,255,0.4)"
+            tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }}
+            tickLine={false}
+            axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: 'rgba(15, 23, 42, 0.95)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(239, 68, 68, 0.2)',
+              borderRadius: '12px',
+              padding: '12px 16px',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
               color: '#fff'
             }}
-            formatter={(value: number) => `$${value.toLocaleString()}`}
+            labelStyle={{
+              color: 'rgba(255,255,255,0.7)',
+              fontSize: '12px',
+              marginBottom: '4px'
+            }}
+            itemStyle={{
+              color: '#ef4444',
+              fontSize: '14px',
+              fontWeight: '600'
+            }}
+            formatter={(value: number) => [`$${value.toLocaleString()}`, 'Spending']}
+            cursor={{ stroke: 'rgba(239, 68, 68, 0.2)', strokeWidth: 2 }}
           />
-          <Line 
-            type="monotone" 
-            dataKey="spending" 
-            stroke="#ef4444" 
-            strokeWidth={2}
-            dot={{ fill: '#ef4444', r: 4 }}
+          <Line
+            type="monotone"
+            dataKey="spending"
+            stroke="url(#lineGradient)"
+            strokeWidth={3}
+            dot={<CustomDot />}
+            activeDot={{ r: 8, fill: '#ef4444', stroke: '#fff', strokeWidth: 2 }}
             name="Spending"
+            filter="url(#lineGlow)"
+            animationDuration={1000}
+            animationEasing="ease-in-out"
           />
         </LineChart>
       </ResponsiveContainer>
     </div>
   );
 }
+
