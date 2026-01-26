@@ -5,7 +5,7 @@ import { exportToCSV } from '../utils/export';
 import { generatePDFReport } from '../utils/pdfReport';
 
 export default function Settings() {
-  const { settings, updateSettings, exportData, importData, resetToSeed } = useStore();
+  const { settings, updateSettings, exportData, importData, resetToSeed, addToast } = useStore();
   const store = useStore;
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -16,23 +16,24 @@ export default function Settings() {
     const data = exportData();
     setExportDataText(data);
     setIsExportModalOpen(true);
+    addToast('Data exported to JSON', 'success');
   };
 
   const handleImport = () => {
     try {
       importData(importDataText);
-      alert('Data imported successfully!');
+      addToast('Data imported successfully!', 'success');
       setIsImportModalOpen(false);
       setImportDataText('');
     } catch (error) {
-      alert('Failed to import data. Please check the format.');
+      addToast('Failed to import data. Please check the format.', 'error');
     }
   };
 
   const handleReset = () => {
     if (confirm('Are you sure you want to reset all data to seed data? This cannot be undone.')) {
       resetToSeed();
-      alert('Data reset to seed data.');
+      addToast('Data reset to seed data.', 'info');
     }
   };
 
@@ -241,7 +242,7 @@ export default function Settings() {
           <button
             onClick={() => {
               navigator.clipboard.writeText(exportDataText);
-              alert('Copied to clipboard!');
+              addToast('Copied to clipboard!', 'success');
             }}
             className="w-full px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg font-medium transition-colors"
           >

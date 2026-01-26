@@ -21,7 +21,7 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
 
   return (
     <div
-      className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 glass-card rounded-xl px-4 py-3 border ${typeStyles[type]} animate-fade-in shadow-lg`}
+      className={`glass-card rounded-xl px-4 py-3 border ${typeStyles[type]} animate-fade-in shadow-lg min-w-[200px] pointer-events-auto`}
     >
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium">{message}</span>

@@ -141,9 +141,21 @@ export const useStore = create<AppState>()(
         set((state) => ({ couples: { ...state.couples, ...updates } }));
       },
 
-      // Settings actions
       updateSettings: (updates) => {
         set((state) => ({ settings: { ...state.settings, ...updates } }));
+      },
+
+      toasts: [],
+      addToast: (message, type = 'info') => {
+        const id = Date.now().toString();
+        set((state) => ({
+          toasts: [...state.toasts, { id, message, type }],
+        }));
+      },
+      removeToast: (id) => {
+        set((state) => ({
+          toasts: state.toasts.filter((t) => t.id !== id),
+        }));
       },
 
       // Utilities
@@ -156,13 +168,13 @@ export const useStore = create<AppState>()(
         const { accounts, subscriptions } = get();
         const checkingAccounts = accounts.filter((a) => a.type === 'checking' && !a.archived);
         const totalCash = checkingAccounts.reduce((sum, acc) => sum + acc.balance, 0);
-        
+
         // Calculate upcoming bills
         const now = new Date();
         const upcomingBills = subscriptions
           .filter((s) => !s.cancelled && s.dueDate >= now.getDate())
           .reduce((sum, s) => sum + s.amount, 0);
-        
+
         return Math.max(0, totalCash - upcomingBills);
       },
 
@@ -261,6 +273,10 @@ export const useStore = create<AppState>()(
     {
       name: 'plana-storage',
       version: 1,
+      partialize: (state) => {
+        const { toasts, ...rest } = state;
+        return rest;
+      },
     }
   )
 );

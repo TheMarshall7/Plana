@@ -18,6 +18,8 @@ import CashFlow from './pages/CashFlow';
 import Settings from './pages/Settings';
 import Onboarding from './pages/Onboarding';
 
+import ToastContainer from './components/ToastContainer';
+
 function App() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const { settings } = useStore();
@@ -109,6 +111,7 @@ function App() {
           </main>
 
           <BottomNav />
+          <ToastContainer />
           <CommandPalette
             isOpen={isCommandPaletteOpen}
             onClose={() => setIsCommandPaletteOpen(false)}

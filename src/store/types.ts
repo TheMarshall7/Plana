@@ -113,6 +113,13 @@ export interface Settings {
   seedData: boolean;
 }
 
+// Toast
+export interface Toast {
+  id: string;
+  message: string;
+  type: 'success' | 'error' | 'info';
+}
+
 // App State
 export interface AppState {
   accounts: Account[];
@@ -123,6 +130,7 @@ export interface AppState {
   debts: Debt[];
   couples: CouplesSettings;
   settings: Settings;
+  toasts: Toast[];
 
   // Actions
   addAccount: (account: Omit<Account, 'id'>) => void;
@@ -150,6 +158,9 @@ export interface AppState {
 
   updateCouples: (updates: Partial<CouplesSettings>) => void;
   updateSettings: (updates: Partial<Settings>) => void;
+
+  addToast: (message: string, type?: 'success' | 'error' | 'info') => void;
+  removeToast: (id: string) => void;
 
   // Utilities
   getAccountBalance: (accountId: string) => number;

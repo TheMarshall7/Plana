@@ -7,7 +7,7 @@ import CategoryPieChart from '../components/charts/CategoryPieChart';
 import PersonalizedGreeting from '../components/PersonalizedGreeting';
 
 export default function Dashboard() {
-  const { getSafeToSpend, accounts, subscriptions, transactions, settings } = useStore();
+  const { getSafeToSpend, accounts, subscriptions, transactions, settings, addToast } = useStore();
   const safeToSpend = getSafeToSpend();
 
   // Calculate KPIs
@@ -223,7 +223,12 @@ export default function Dashboard() {
               <div>
                 <h3 className="text-sm font-medium text-white/90 mb-1">Financial Tip</h3>
                 <p className="text-xs text-white/60 leading-relaxed mb-4">You have a $200 surplus. Moving it to "Emergency Fund" would reach your 3-month goal 2 weeks earlier.</p>
-                <button className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300 transition-colors">Apply Strategy</button>
+                <button
+                  onClick={() => addToast('Strategy applied to Emergency Fund', 'success')}
+                  className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300 transition-colors"
+                >
+                  Apply Strategy
+                </button>
               </div>
             </div>
           </section>

@@ -20,7 +20,7 @@ const accountTypes: { value: AccountType; label: string; icon: string }[] = [
 const colors = ['#10b981', '#06b6d4', '#f59e0b', '#8b5cf6', '#ec4899', '#ef4444', '#14b8a6', '#6366f1'];
 
 export default function Accounts() {
-  const { accounts, addAccount, updateAccount, deleteAccount, transactions } = useStore();
+  const { accounts, addAccount, updateAccount, deleteAccount, transactions, addToast } = useStore();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
@@ -42,12 +42,15 @@ export default function Accounts() {
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this account? This will also delete all associated transactions.')) {
       deleteAccount(id);
+      addToast('Account deleted successfully', 'error');
     }
   };
 
   const handleArchive = (id: string, archived: boolean) => {
     updateAccount(id, { archived });
+    addToast(archived ? 'Account archived' : 'Account restored', 'info');
   };
+
 
   const getAccountTransactions = (accountId: string) => {
     return transactions.filter(t => t.accountId === accountId);
@@ -133,7 +136,7 @@ export default function Accounts() {
             {activeAccounts.map((account) => {
               const balance = getAccountBalance(account);
               const accountType = accountTypes.find(t => t.value === account.type);
-              
+
               return (
                 <div
                   key={account.id}
@@ -218,7 +221,7 @@ export default function Accounts() {
             {archivedAccounts.map((account) => {
               const balance = getAccountBalance(account);
               const accountType = accountTypes.find(t => t.value === account.type);
-              
+
               return (
                 <div
                   key={account.id}
@@ -271,8 +274,10 @@ export default function Accounts() {
         onSave={(data) => {
           if (editingAccount) {
             updateAccount(editingAccount.id, data);
+            addToast('Account updated successfully', 'success');
           } else {
             addAccount(data);
+            addToast('Account created successfully', 'success');
           }
           setIsModalOpen(false);
           setEditingAccount(null);
@@ -363,9 +368,8 @@ function AccountModal({ isOpen, onClose, account, onSave }: AccountModalProps) {
                 key={color}
                 type="button"
                 onClick={() => setFormData({ ...formData, color })}
-                className={`w-8 h-8 rounded-lg border-2 transition-all ${
-                  formData.color === color ? 'border-white scale-110' : 'border-white/20'
-                }`}
+                className={`w-8 h-8 rounded-lg border-2 transition-all ${formData.color === color ? 'border-white scale-110' : 'border-white/20'
+                  }`}
                 style={{ backgroundColor: color }}
               />
             ))}

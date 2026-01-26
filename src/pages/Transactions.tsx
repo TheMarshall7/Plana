@@ -12,7 +12,7 @@ const categories = [
 ];
 
 export default function Transactions() {
-  const { transactions, accounts, addTransaction, updateTransaction, deleteTransaction } = useStore();
+  const { transactions, accounts, addTransaction, updateTransaction, deleteTransaction, addToast } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -54,7 +54,7 @@ export default function Transactions() {
     if (dateFilter !== 'all') {
       const now = new Date();
       let start: Date, end: Date;
-      
+
       if (dateFilter === 'today') {
         start = new Date(now.setHours(0, 0, 0, 0));
         end = new Date(now.setHours(23, 59, 59, 999));
@@ -69,7 +69,7 @@ export default function Transactions() {
         start = subMonths(now, 3);
         end = new Date();
       }
-      
+
       filtered = filtered.filter(t => {
         const tDate = parseISO(t.date);
         return tDate >= start! && tDate <= end!;
@@ -105,6 +105,7 @@ export default function Transactions() {
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this transaction?')) {
       deleteTransaction(id);
+      addToast('Transaction deleted', 'error');
     }
   };
 
@@ -112,6 +113,7 @@ export default function Transactions() {
     if (selectedIds.size === 0) return;
     if (confirm(`Are you sure you want to delete ${selectedIds.size} transaction(s)?`)) {
       selectedIds.forEach(id => deleteTransaction(id));
+      addToast(`${selectedIds.size} transactions deleted`, 'error');
       setSelectedIds(new Set());
     }
   };
@@ -257,57 +259,57 @@ export default function Transactions() {
             </div>
             <div className="lg:space-y-2">
               {filteredTransactions.map((transaction) => {
-              const account = accounts.find(a => a.id === transaction.accountId);
-              const isIncome = transaction.type === 'income';
-              const isExpense = transaction.type === 'expense';
-              
-              return (
-                <div
-                  key={transaction.id}
-                  className="glass-card rounded-2xl p-4 lg:p-5 flex items-center gap-3 hover:bg-white/5 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(transaction.id)}
-                    onChange={() => toggleSelect(transaction.id)}
-                    className="w-4 h-4 rounded border-white/20 bg-white/5"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm font-medium text-white/90">{transaction.description}</p>
-                      <p className={`text-sm font-semibold ${isIncome ? 'text-emerald-400' : isExpense ? 'text-red-400' : 'text-white/70'}`}>
-                        {isIncome ? '+' : isExpense ? '-' : ''}${Math.abs(transaction.amount).toLocaleString()}
-                      </p>
+                const account = accounts.find(a => a.id === transaction.accountId);
+                const isIncome = transaction.type === 'income';
+                const isExpense = transaction.type === 'expense';
+
+                return (
+                  <div
+                    key={transaction.id}
+                    className="glass-card rounded-2xl p-4 lg:p-5 flex items-center gap-3 hover:bg-white/5 transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(transaction.id)}
+                      onChange={() => toggleSelect(transaction.id)}
+                      className="w-4 h-4 rounded border-white/20 bg-white/5"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-sm font-medium text-white/90">{transaction.description}</p>
+                        <p className={`text-sm font-semibold ${isIncome ? 'text-emerald-400' : isExpense ? 'text-red-400' : 'text-white/70'}`}>
+                          {isIncome ? '+' : isExpense ? '-' : ''}${Math.abs(transaction.amount).toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-white/50">
+                        <span>{format(parseISO(transaction.date), 'MMM d, yyyy')}</span>
+                        <span>•</span>
+                        <span>{transaction.category}</span>
+                        {account && (
+                          <>
+                            <span>•</span>
+                            <span>{account.name}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-white/50">
-                      <span>{format(parseISO(transaction.date), 'MMM d, yyyy')}</span>
-                      <span>•</span>
-                      <span>{transaction.category}</span>
-                      {account && (
-                        <>
-                          <span>•</span>
-                          <span>{account.name}</span>
-                        </>
-                      )}
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleEdit(transaction)}
+                        className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center transition-colors"
+                      >
+                        <iconify-icon icon="solar:pen-linear" className="text-white/70" width="18"></iconify-icon>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(transaction.id)}
+                        className="w-8 h-8 rounded-lg hover:bg-red-500/20 flex items-center justify-center transition-colors"
+                      >
+                        <iconify-icon icon="solar:trash-bin-linear" className="text-red-400" width="18"></iconify-icon>
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => handleEdit(transaction)}
-                      className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center transition-colors"
-                    >
-                      <iconify-icon icon="solar:pen-linear" className="text-white/70" width="18"></iconify-icon>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(transaction.id)}
-                      className="w-8 h-8 rounded-lg hover:bg-red-500/20 flex items-center justify-center transition-colors"
-                    >
-                      <iconify-icon icon="solar:trash-bin-linear" className="text-red-400" width="18"></iconify-icon>
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
             </div>
           </>
         )}
@@ -325,8 +327,10 @@ export default function Transactions() {
         onSave={(data) => {
           if (editingTransaction) {
             updateTransaction(editingTransaction.id, data);
+            addToast('Transaction updated', 'success');
           } else {
             addTransaction(data);
+            addToast('Transaction added', 'success');
           }
           setIsModalOpen(false);
           setEditingTransaction(null);
@@ -359,7 +363,7 @@ function TransactionModal({ isOpen, onClose, transaction, accounts, onSave }: Tr
     e.preventDefault();
     const amount = parseFloat(formData.amount);
     if (isNaN(amount) || amount <= 0) return;
-    
+
     onSave({
       accountId: formData.accountId,
       amount: formData.type === 'income' ? amount : -amount,
