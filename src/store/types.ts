@@ -1,12 +1,12 @@
 // Account Types
-export type AccountType = 
-  | 'checking' 
-  | 'savings' 
-  | 'credit' 
-  | 'cash' 
-  | 'investment' 
-  | 'crypto' 
-  | 'loan' 
+export type AccountType =
+  | 'checking'
+  | 'savings'
+  | 'credit'
+  | 'cash'
+  | 'investment'
+  | 'crypto'
+  | 'loan'
   | 'other';
 
 export interface Account {
@@ -101,6 +101,7 @@ export interface CouplesSettings {
 
 // Settings
 export interface Settings {
+  userName?: string;
   guidedMode: boolean;
   beginnerMode: boolean;
   theme: 'light' | 'dark' | 'auto';
@@ -122,34 +123,34 @@ export interface AppState {
   debts: Debt[];
   couples: CouplesSettings;
   settings: Settings;
-  
+
   // Actions
   addAccount: (account: Omit<Account, 'id'>) => void;
   updateAccount: (id: string, updates: Partial<Account>) => void;
   deleteAccount: (id: string) => void;
-  
+
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   updateTransaction: (id: string, updates: Partial<Transaction>) => void;
   deleteTransaction: (id: string) => void;
-  
+
   addBudget: (budget: Budget) => void;
   updateBudget: (month: string, updates: Partial<Budget>) => void;
-  
+
   addSubscription: (subscription: Omit<Subscription, 'id'>) => void;
   updateSubscription: (id: string, updates: Partial<Subscription>) => void;
   deleteSubscription: (id: string) => void;
-  
+
   addGoal: (goal: Omit<Goal, 'id'>) => void;
   updateGoal: (id: string, updates: Partial<Goal>) => void;
   deleteGoal: (id: string) => void;
-  
+
   addDebt: (debt: Omit<Debt, 'id'>) => void;
   updateDebt: (id: string, updates: Partial<Debt>) => void;
   deleteDebt: (id: string) => void;
-  
+
   updateCouples: (updates: Partial<CouplesSettings>) => void;
   updateSettings: (updates: Partial<Settings>) => void;
-  
+
   // Utilities
   getAccountBalance: (accountId: string) => number;
   getSafeToSpend: () => number;

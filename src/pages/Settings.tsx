@@ -38,25 +38,25 @@ export default function Settings() {
 
   const handleExportCSV = () => {
     const state = store.getState();
-    exportToCSV({ 
-      accounts: state.accounts, 
-      transactions: state.transactions, 
-      budgets: state.budgets, 
-      subscriptions: state.subscriptions, 
-      goals: state.goals, 
-      debts: state.debts 
+    exportToCSV({
+      accounts: state.accounts,
+      transactions: state.transactions,
+      budgets: state.budgets,
+      subscriptions: state.subscriptions,
+      goals: state.goals,
+      debts: state.debts
     });
   };
 
   const handleExportPDF = () => {
     const state = store.getState();
-    generatePDFReport({ 
-      accounts: state.accounts, 
-      transactions: state.transactions, 
-      budgets: state.budgets, 
-      subscriptions: state.subscriptions, 
-      goals: state.goals, 
-      debts: state.debts 
+    generatePDFReport({
+      accounts: state.accounts,
+      transactions: state.transactions,
+      budgets: state.budgets,
+      subscriptions: state.subscriptions,
+      goals: state.goals,
+      debts: state.debts
     });
   };
 
@@ -67,6 +67,18 @@ export default function Settings() {
       {/* Preferences */}
       <div className="glass-card rounded-2xl p-4 space-y-4">
         <h2 className="text-sm font-medium text-white/90">Preferences</h2>
+
+        <div>
+          <label className="block text-sm font-medium text-white/70 mb-1">Your Name</label>
+          <input
+            type="text"
+            value={settings.userName || ''}
+            onChange={(e) => updateSettings({ userName: e.target.value })}
+            placeholder="e.g., Brian Lewis"
+            className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-emerald-500/50"
+          />
+          <p className="text-xs text-white/40 mt-1">Used for personalized greetings</p>
+        </div>
 
         <div className="flex items-center justify-between">
           <div>
