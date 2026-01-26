@@ -29,7 +29,7 @@ export default function BottomNav() {
           {/* Main Glass Bar */}
           <div className="glass-nav px-2 py-3 rounded-[32px] flex items-center justify-between gap-1 w-full shadow-2xl shadow-black/40 pointer-events-auto bg-[#0F1815]/90 backdrop-blur-xl border border-white/10 relative">
 
-            {navItems.map((item, index) => {
+            {navItems.map((item) => {
               if (item.isSpacer) {
                 return <div key="spacer" className="w-16" />;
               }
