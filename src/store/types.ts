@@ -47,6 +47,7 @@ export interface ItineraryItem {
   date: string;
   time?: string;
   activity: string;
+  category: 'flight' | 'stay' | 'food' | 'activity' | 'transport' | 'other';
   location?: string;
   cost?: number;
 }

@@ -57,7 +57,7 @@ export default function Travel() {
             {activeTrips.length === 0 ? (
                 <div className="glass-card rounded-[32px] p-12 text-center space-y-4">
                     <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto text-emerald-400">
-                        <iconify-icon icon="solar:palmtree-bold-duotone" width="40"></iconify-icon>
+                        <iconify-icon icon="solar:suitcase-tag-bold-duotone" width="40"></iconify-icon>
                     </div>
                     <div>
                         <h3 className="text-lg font-medium text-white/90">No trips planned yet</h3>
@@ -87,7 +87,7 @@ export default function Travel() {
                                 <div className="flex justify-between items-start mb-6">
                                     <div className="flex items-center gap-4">
                                         <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/10">
-                                            <iconify-icon icon="solar:globus-linear" width="24"></iconify-icon>
+                                            <iconify-icon icon="solar:suitcase-tag-linear" width="24"></iconify-icon>
                                         </div>
                                         <div>
                                             <h3 className="text-lg font-semibold text-white/90 group-hover:text-emerald-400 transition-colors">

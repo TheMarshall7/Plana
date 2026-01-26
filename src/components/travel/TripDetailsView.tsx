@@ -149,10 +149,17 @@ export default function TripDetailsView() {
                                                 <div className="flex gap-4">
                                                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/60">
                                                         <iconify-icon
-                                                            icon={item.activity.toLowerCase().includes('flight') ? 'solar:plain-linear' :
-                                                                item.activity.toLowerCase().includes('hotel') ? 'solar:home-linear' :
-                                                                    item.activity.toLowerCase().includes('dinner') || item.activity.toLowerCase().includes('food') ? 'solar:cup-hot-linear' :
-                                                                        'solar:star-linear'}
+                                                            icon={
+                                                                item.category === 'flight' ? 'solar:plain-linear' :
+                                                                    item.category === 'stay' ? 'solar:home-linear' :
+                                                                        item.category === 'food' ? 'solar:cup-hot-linear' :
+                                                                            item.category === 'transport' ? 'solar:bus-linear' :
+                                                                                item.category === 'activity' ? 'solar:star-linear' :
+                                                                                    item.activity.toLowerCase().includes('flight') ? 'solar:plain-linear' :
+                                                                                        item.activity.toLowerCase().includes('hotel') || item.activity.toLowerCase().includes('stay') ? 'solar:home-linear' :
+                                                                                            item.activity.toLowerCase().includes('dinner') || item.activity.toLowerCase().includes('food') || item.activity.toLowerCase().includes('eat') ? 'solar:cup-hot-linear' :
+                                                                                                'solar:star-linear'
+                                                            }
                                                             width="20"
                                                         ></iconify-icon>
                                                     </div>
@@ -222,6 +229,7 @@ function ItineraryItemModal({ isOpen, onClose, item, onSave, onDelete }: any) {
         date: '',
         time: '',
         activity: '',
+        category: 'activity' as any,
         location: '',
         cost: '',
     });
@@ -232,6 +240,7 @@ function ItineraryItemModal({ isOpen, onClose, item, onSave, onDelete }: any) {
                 date: item.date || '',
                 time: item.time || '',
                 activity: item.activity || '',
+                category: item.category || 'activity',
                 location: item.location || '',
                 cost: item.cost?.toString() || '',
             });
@@ -271,16 +280,33 @@ function ItineraryItemModal({ isOpen, onClose, item, onSave, onDelete }: any) {
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-white/70 mb-1.5">Activity</label>
-                    <input
-                        type="text"
-                        value={formData.activity}
-                        onChange={(e) => setFormData({ ...formData, activity: e.target.value })}
-                        placeholder="e.g., Flight to Tokyo, Check-in at Hotel"
-                        required
-                        className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-all"
-                    />
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-1">
+                        <label className="block text-sm font-medium text-white/70 mb-1.5">Category</label>
+                        <select
+                            value={formData.category}
+                            onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+                            className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-all"
+                        >
+                            <option value="activity">Activity</option>
+                            <option value="stay">Stay / Hotel</option>
+                            <option value="food">Food / Dining</option>
+                            <option value="flight">Flight</option>
+                            <option value="transport">Transport</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div className="col-span-1">
+                        <label className="block text-sm font-medium text-white/70 mb-1.5">Activity Name</label>
+                        <input
+                            type="text"
+                            value={formData.activity}
+                            onChange={(e) => setFormData({ ...formData, activity: e.target.value })}
+                            placeholder="e.g., Dinner at Sushiro"
+                            required
+                            className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-all"
+                        />
+                    </div>
                 </div>
 
                 <div>
