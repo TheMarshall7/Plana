@@ -3,6 +3,7 @@ import { useStore } from '../store/store';
 import { format, parseISO } from 'date-fns';
 import Modal from '../components/Modal';
 import type { Subscription, BillCadence } from '../store/types';
+import { generateGoogleCalendarLink } from '../utils/calendar';
 
 const categories = [
   'Bills', 'Entertainment', 'Software', 'Streaming', 'Health', 'Education', 'Other'
@@ -47,7 +48,7 @@ export default function Subscriptions() {
     const now = new Date();
     const currentDay = now.getDate();
     let dueDate = new Date(now.getFullYear(), now.getMonth(), subscription.dueDate);
-    
+
     if (subscription.cadence === 'weekly') {
       dueDate = new Date(now);
       dueDate.setDate(dueDate.getDate() + (7 - (dueDate.getDay() || 7) + 1));
@@ -61,7 +62,7 @@ export default function Subscriptions() {
         dueDate = new Date(now.getFullYear(), now.getMonth() + 1, subscription.dueDate);
       }
     }
-    
+
     return dueDate;
   };
 
@@ -178,6 +179,15 @@ export default function Subscriptions() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 ml-3">
+                    <a
+                      href={generateGoogleCalendarLink(subscription.name, subscription.amount, subscription.dueDate)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center transition-colors text-white/70 hover:text-emerald-400"
+                      title="Add to Google Calendar"
+                    >
+                      <iconify-icon icon="solar:calendar-add-linear" width="18"></iconify-icon>
+                    </a>
                     <button
                       onClick={() => handleEdit(subscription)}
                       className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center transition-colors"

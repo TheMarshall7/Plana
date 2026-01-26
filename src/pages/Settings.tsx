@@ -12,6 +12,13 @@ export default function Settings() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [exportDataText, setExportDataText] = useState('');
   const [importDataText, setImportDataText] = useState('');
+  const [shouldAutoUpdate, setShouldAutoUpdate] = useState(true);
+
+  // Auto-update legacy Supabase URL to new project ID if match found
+  if (shouldAutoUpdate && settings.supabaseUrl === 'https://evlnjtakkvwlxxspmelt.supabase.co') {
+    updateSettings({ supabaseUrl: 'https://o6rfrHjCK88syRQV.supabase.co' });
+    setShouldAutoUpdate(false);
+  }
 
   const handleExport = () => {
     const data = exportData();
@@ -79,8 +86,8 @@ export default function Settings() {
                 store.addToast(`Switched to ${user.name}'s profile`, 'info');
               }}
               className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${activeUserId === user.id
-                  ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400'
-                  : 'bg-white/5 border-white/5 text-white/60 hover:bg-white/10'
+                ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400'
+                : 'bg-white/5 border-white/5 text-white/60 hover:bg-white/10'
                 }`}
             >
               <div
@@ -124,7 +131,10 @@ export default function Settings() {
             <input
               type="checkbox"
               checked={settings.guidedMode}
-              onChange={(e) => updateSettings({ guidedMode: e.target.checked })}
+              onChange={(e) => {
+                updateSettings({ guidedMode: e.target.checked });
+                addToast(e.target.checked ? 'Guided Mode Enabled' : 'Guided Mode Disabled', 'info');
+              }}
               className="sr-only peer"
             />
             <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
@@ -140,7 +150,10 @@ export default function Settings() {
             <input
               type="checkbox"
               checked={settings.beginnerMode}
-              onChange={(e) => updateSettings({ beginnerMode: e.target.checked })}
+              onChange={(e) => {
+                updateSettings({ beginnerMode: e.target.checked });
+                addToast(e.target.checked ? 'Beginner Mode Enabled' : 'Beginner Mode Disabled', 'info');
+              }}
               className="sr-only peer"
             />
             <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
@@ -151,7 +164,10 @@ export default function Settings() {
           <label className="block text-sm font-medium text-white/70 mb-1">Theme</label>
           <select
             value={settings.theme}
-            onChange={(e) => updateSettings({ theme: e.target.value as any })}
+            onChange={(e) => {
+              updateSettings({ theme: e.target.value as any });
+              addToast('Theme updated (Coming Soon: Full Light Mode)', 'info');
+            }}
             className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
           >
             <option value="light">Light</option>

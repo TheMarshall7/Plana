@@ -20,6 +20,7 @@ export interface Account {
   integrationId?: string;
   integrationType?: 'paypal' | 'stripe' | 'gohighlevel';
   ownership?: 'brian' | 'nadine' | 'joint';
+  userId?: string;
 }
 
 // Transaction Types

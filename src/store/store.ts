@@ -89,9 +89,10 @@ const apiStorage: StateStorage = {
 
 // Seed data for demo
 const seedAccounts: Account[] = [
-  { id: '1', name: 'Chase Checking', type: 'checking', balance: 4200, color: '#10b981', institution: 'Chase', archived: false },
-  { id: '2', name: 'Savings', type: 'savings', balance: 15000, color: '#06b6d4', archived: false },
-  { id: '3', name: 'Credit Card', type: 'credit', balance: -1200, color: '#f59e0b', archived: false },
+  { id: '1', name: 'Chase Checking', type: 'checking', balance: 4200, color: '#10b981', institution: 'Chase', archived: false, userId: 'brian' },
+  { id: '2', name: 'Savings', type: 'savings', balance: 15000, color: '#06b6d4', archived: false, userId: 'brian' },
+  { id: '3', name: 'Credit Card', type: 'credit', balance: -1200, color: '#f59e0b', archived: false, userId: 'brian' },
+  { id: '4', name: 'Nadine Checking', type: 'checking', balance: 3200, color: '#8b5cf6', institution: 'Wells Fargo', archived: false, userId: 'nadine' },
 ];
 
 const seedTransactions: Transaction[] = [
@@ -109,6 +110,8 @@ const seedSettings: Settings = {
   payoffStrategy: 'snowball',
   onboardingCompleted: false,
   seedData: true,
+  supabaseUrl: 'https://o6rfrHjCK88syRQV.supabase.co',
+  supabaseKey: 'sb_publishable_y5TS3jCVKls-LjaZbk-tNA_QXtx7b55',
 };
 
 export const useStore = create<AppState>()(

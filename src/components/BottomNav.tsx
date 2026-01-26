@@ -6,7 +6,7 @@ export default function BottomNav() {
   const navItems = [
     { path: '/', icon: 'solar:home-angle-linear', label: 'Home' },
     { path: '/accounts', icon: 'solar:wallet-linear', label: 'Wallet' },
-    { path: '/travel', icon: 'solar:palmtree-linear', label: 'Travel' },
+    { path: '/travel', icon: 'solar:suitcase-tag-linear', label: 'Travel' },
     { path: '/transactions', icon: 'solar:chart-2-linear', label: 'Chart' },
     { path: '/settings', icon: 'solar:settings-linear', label: 'Settings' },
   ];
@@ -21,7 +21,7 @@ export default function BottomNav() {
   return (
     <nav className="lg:hidden fixed bottom-6 left-0 right-0 z-50 animate-fade-in delay-300">
       <div className="max-w-[420px] mx-auto flex justify-center">
-        <div className="glass-nav px-4 py-3 rounded-full flex items-center justify-center gap-0 w-[280px] shadow-2xl shadow-black/40">
+        <div className="glass-nav px-6 py-3 rounded-full flex items-center justify-between gap-0 w-full max-w-[340px] shadow-2xl shadow-black/40">
           {navItems.map((item) => (
             <Link
               key={item.path}

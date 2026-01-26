@@ -71,7 +71,7 @@ function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <ScrollToTop />
-        <div className="h-screen w-screen overflow-hidden flex flex-col relative">
+        <div className="h-[100dvh] w-screen overflow-hidden flex flex-col relative">
           {/* Ambient Background Gradients */}
           <div className="absolute inset-0 pointer-events-none z-0">
             <div className="absolute inset-0 bg-gradient-to-b from-[#0F2922] via-[#081A14] to-[#020C09]"></div>

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useStore } from '../store/store';
 import UserSelector from './UserSelector';
 
 export default function Header() {
@@ -12,8 +13,12 @@ export default function Header() {
       </Link>
 
       <div className="flex items-center gap-3">
-        <button className="w-10 h-10 lg:w-12 lg:h-12 rounded-full hover:bg-white/5 flex items-center justify-center transition-colors">
+        <button
+          onClick={() => useStore.getState().addToast('No new notifications', 'info')}
+          className="w-10 h-10 lg:w-12 lg:h-12 rounded-full hover:bg-white/5 flex items-center justify-center transition-colors relative"
+        >
           <iconify-icon icon="solar:bell-linear" className="text-white/70" width="22"></iconify-icon>
+          <div className="absolute top-3 right-3 w-2 h-2 bg-rose-500 rounded-full border border-[#0B1E18]"></div>
         </button>
         <div className="">
           <UserSelector />

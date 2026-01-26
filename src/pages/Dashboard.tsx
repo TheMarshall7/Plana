@@ -30,6 +30,15 @@ export default function Dashboard() {
     .filter(s => !s.cancelled && s.dueDate >= now.getDate())
     .slice(0, 2);
 
+  // Sort accounts: Active User first, then others
+  const sortedAccounts = [...accounts].sort((a, b) => {
+    if (a.userId === activeUserId && b.userId !== activeUserId) return -1;
+    if (a.userId !== activeUserId && b.userId === activeUserId) return 1;
+    return 0;
+  });
+
+  const { settings } = useStore();
+
   return (
     <div className="px-5 lg:px-0 space-y-6 lg:space-y-8 animate-fade-in">
       <PersonalizedGreeting userName={activeUser?.name} />
@@ -46,7 +55,10 @@ export default function Dashboard() {
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-emerald-500/5 rounded-full blur-[80px] pointer-events-none"></div>
 
               <div className="relative z-10 flex flex-col items-center">
-                <p className="text-emerald-200/60 text-sm font-medium tracking-wide uppercase mb-4">Safe to Spend Today</p>
+                <p className="text-emerald-200/60 text-sm font-medium tracking-wide uppercase mb-4">
+                  Safe to Spend Today
+                  {settings.guidedMode && <span className="block text-[10px] lowercase opacity-70 mt-1">(after all bills are paid)</span>}
+                </p>
 
                 <div className="flex items-baseline gap-1 text-white mb-2">
                   <span className="text-4xl font-light text-white/30 align-top mt-2">$</span>
@@ -57,7 +69,7 @@ export default function Dashboard() {
 
                 <div className="mt-8 inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/5 backdrop-blur-xl">
                   <iconify-icon icon="solar:calendar-mark-linear" className="text-emerald-400" width="16"></iconify-icon>
-                  <span className="text-sm text-white/70 font-medium">After bills · Next Payday in 4 days</span>
+                  <span className="text-sm text-white/70 font-medium">Next Payday in 4 days</span>
                 </div>
               </div>
             </div>
@@ -89,7 +101,7 @@ export default function Dashboard() {
             </div>
 
             <div className="grid lg:grid-cols-1 gap-6">
-              {/* Primary Net Worth Chart */}
+              {/* Primary Net Worth Chart - Always Visible */}
               {accounts.filter(a => !a.archived).length > 0 && (
                 <div className="glass-card rounded-[28px] p-6 lg:p-8">
                   <div className="flex items-center justify-between mb-8">
@@ -98,34 +110,39 @@ export default function Dashboard() {
                       <p className="text-xs text-white/40 mt-1">Tracking cumulative asset value</p>
                     </div>
                   </div>
-                  <NetWorthChart accounts={accounts} transactions={transactions} months={6} />
+                  <NetWorthChart accounts={sortedAccounts} transactions={transactions} months={6} />
                 </div>
               )}
 
-              {/* Spending Trend Chart */}
-              {transactions.filter(t => t.type === 'expense').length > 0 && (
-                <div className="glass-card rounded-[28px] p-6 lg:p-8">
-                  <div className="flex items-center justify-between mb-8">
-                    <div>
-                      <h3 className="text-sm font-medium text-white/90">Spending Intensity</h3>
-                      <p className="text-xs text-white/40 mt-1">Monthly outflow analysis</p>
+              {/* Advanced Charts - Hidden in Beginner Mode */}
+              {!settings.beginnerMode && (
+                <>
+                  {/* Spending Trend Chart */}
+                  {transactions.filter(t => t.type === 'expense').length > 0 && (
+                    <div className="glass-card rounded-[28px] p-6 lg:p-8">
+                      <div className="flex items-center justify-between mb-8">
+                        <div>
+                          <h3 className="text-sm font-medium text-white/90">Spending Intensity</h3>
+                          <p className="text-xs text-white/40 mt-1">Monthly outflow analysis</p>
+                        </div>
+                      </div>
+                      <SpendingTrendChart transactions={transactions} months={6} />
                     </div>
-                  </div>
-                  <SpendingTrendChart transactions={transactions} months={6} />
-                </div>
-              )}
+                  )}
 
-              {/* Monthly Comparison Chart */}
-              {transactions.length > 0 && (
-                <div className="glass-card rounded-[28px] p-6 lg:p-8">
-                  <div className="flex items-center justify-between mb-8">
-                    <div>
-                      <h3 className="text-sm font-medium text-white/90">Cash Flow Comparison</h3>
-                      <p className="text-xs text-white/40 mt-1">Income vs Expenses monthly</p>
+                  {/* Monthly Comparison Chart */}
+                  {transactions.length > 0 && (
+                    <div className="glass-card rounded-[28px] p-6 lg:p-8">
+                      <div className="flex items-center justify-between mb-8">
+                        <div>
+                          <h3 className="text-sm font-medium text-white/90">Cash Flow Comparison</h3>
+                          <p className="text-xs text-white/40 mt-1">Income vs Expenses monthly</p>
+                        </div>
+                      </div>
+                      <MonthlyComparisonChart transactions={transactions} months={6} />
                     </div>
-                  </div>
-                  <MonthlyComparisonChart transactions={transactions} months={6} />
-                </div>
+                  )}
+                </>
               )}
             </div>
           </section>

@@ -55,8 +55,8 @@ export default function UserSelector() {
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-56 glass-card rounded-2xl overflow-hidden animate-fade-in shadow-2xl z-50 border border-white/10">
-                    <div className="px-4 py-3 border-b border-white/5 bg-white/[0.02]">
+                <div className="absolute top-full right-0 mt-3 w-64 glass-card rounded-2xl overflow-hidden animate-fade-in shadow-2xl z-[100] border border-white/10 ring-1 ring-black/5">
+                    <div className="px-5 py-4 border-b border-white/5 bg-white/[0.02]">
                         <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Switch Profile</p>
                     </div>
                     <div className="p-2 space-y-1">
