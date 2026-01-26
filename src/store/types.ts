@@ -146,6 +146,14 @@ export interface Toast {
   type: 'success' | 'error' | 'info';
 }
 
+// User
+export interface User {
+  id: string;
+  name: string;
+  avatar?: string;
+  color: string;
+}
+
 // App State
 export interface AppState {
   accounts: Account[];
@@ -158,6 +166,8 @@ export interface AppState {
   settings: Settings;
   toasts: Toast[];
   trips: Trip[];
+  users: User[];
+  activeUserId: string;
 
   // Actions
   addAccount: (account: Omit<Account, 'id'>) => void;
@@ -195,6 +205,9 @@ export interface AppState {
 
   addToast: (message: string, type?: 'success' | 'error' | 'info') => void;
   removeToast: (id: string) => void;
+
+  setActiveUser: (id: string) => void;
+  updateUser: (id: string, updates: Partial<User>) => void;
 
   // Utilities
   getAccountBalance: (accountId: string) => number;

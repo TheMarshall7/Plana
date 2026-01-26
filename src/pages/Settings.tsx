@@ -5,7 +5,8 @@ import { exportToCSV } from '../utils/export';
 import { generatePDFReport } from '../utils/pdfReport';
 
 export default function Settings() {
-  const { settings, updateSettings, exportData, importData, resetToSeed, addToast } = useStore();
+  const { settings, updateSettings, exportData, importData, resetToSeed, addToast, users, activeUserId, updateUser } = useStore();
+  const activeUser = users.find(u => u.id === activeUserId) || users[0];
   const store = useStore;
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -73,12 +74,12 @@ export default function Settings() {
           <label className="block text-sm font-medium text-white/70 mb-1">Your Name</label>
           <input
             type="text"
-            value={settings.userName || ''}
-            onChange={(e) => updateSettings({ userName: e.target.value })}
+            value={activeUser.name}
+            onChange={(e) => updateUser(activeUserId, { name: e.target.value })}
             placeholder="e.g., Brian Lewis"
             className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-emerald-500/50"
           />
-          <p className="text-xs text-white/40 mt-1">Used for personalized greetings</p>
+          <p className="text-xs text-white/40 mt-1">Updating your profile name ({activeUserId})</p>
         </div>
 
         <div className="flex items-center justify-between">

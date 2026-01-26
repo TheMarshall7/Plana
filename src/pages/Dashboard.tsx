@@ -7,7 +7,8 @@ import CategoryPieChart from '../components/charts/CategoryPieChart';
 import PersonalizedGreeting from '../components/PersonalizedGreeting';
 
 export default function Dashboard() {
-  const { getSafeToSpend, accounts, subscriptions, transactions, settings, addToast } = useStore();
+  const { getSafeToSpend, accounts, subscriptions, transactions, addToast, users, activeUserId } = useStore();
+  const activeUser = users.find(u => u.id === activeUserId) || users[0];
   const safeToSpend = getSafeToSpend();
 
   // Calculate KPIs
@@ -31,7 +32,7 @@ export default function Dashboard() {
 
   return (
     <div className="px-5 lg:px-0 space-y-6 lg:space-y-8 animate-fade-in">
-      <PersonalizedGreeting userName={settings.userName} />
+      <PersonalizedGreeting userName={activeUser?.name} />
 
       {/* Main Grid Layout */}
       <div className="lg:grid lg:grid-cols-12 lg:gap-8">

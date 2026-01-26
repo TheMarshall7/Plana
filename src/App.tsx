@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useStore } from './store/store';
 import Header from './components/Header';
 import BottomNav from './components/BottomNav';
@@ -21,6 +21,16 @@ import Travel from './pages/Travel';
 import TripDetailsView from './components/travel/TripDetailsView';
 
 import ToastContainer from './components/ToastContainer';
+import { useLocation } from 'react-router-dom';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    const main = document.querySelector('.overflow-y-auto');
+    if (main) main.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 function App() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
@@ -37,41 +47,48 @@ function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+  if (!settings.onboardingCompleted) {
+    return (
+      <BrowserRouter>
+        <ScrollToTop />
+        <div className="h-screen w-screen relative overflow-hidden flex items-center justify-center">
+          {/* Ambient Background Gradients */}
+          <div className="fixed inset-0 pointer-events-none z-0">
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0F2922] via-[#081A14] to-[#020C09]"></div>
+            <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-900/20 rounded-full blur-[120px] mix-blend-screen opacity-40"></div>
+          </div>
+          <div className="relative z-10 w-full max-w-md px-5">
+            <Routes>
+              <Route path="*" element={<Onboarding />} />
+            </Routes>
+          </div>
+        </div>
+      </BrowserRouter>
+    );
+  }
+
   return (
     <ErrorBoundary>
       <BrowserRouter>
-        <div className="min-h-screen relative">
+        <ScrollToTop />
+        <div className="h-screen w-screen overflow-hidden flex flex-col relative">
           {/* Ambient Background Gradients */}
-          <div className="fixed inset-0 pointer-events-none z-0">
-            {/* Deep Emerald Core */}
+          <div className="absolute inset-0 pointer-events-none z-0">
             <div className="absolute inset-0 bg-gradient-to-b from-[#0F2922] via-[#081A14] to-[#020C09]"></div>
-
-            {/* Subtle Glows */}
             <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-900/20 rounded-full blur-[120px] mix-blend-screen opacity-40"></div>
             <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-900/10 rounded-full blur-[100px] mix-blend-screen opacity-30"></div>
-            <div className="absolute top-[20%] right-[10%] w-[300px] h-[300px] bg-emerald-500/5 rounded-full blur-[80px] mix-blend-overlay"></div>
           </div>
 
-          {/* Main App Container - Mobile: centered 420px, Desktop: full width */}
-          <main className="relative z-10 w-full max-w-[420px] lg:max-w-none mx-auto min-h-screen flex flex-col">
-            <Header />
-            <div className="flex-1 overflow-y-auto no-scrollbar pb-32 lg:pb-12 px-0">
-              {/* Desktop Layout Container */}
-              <div className="hidden lg:flex lg:items-start lg:gap-8 lg:px-8 lg:py-6 lg:max-w-[1600px] lg:mx-auto lg:w-full min-h-0">
+          <Header />
+
+          <div className="flex-1 overflow-y-auto relative z-10">
+            <div className="max-w-[420px] lg:max-w-none mx-auto min-h-full flex flex-col">
+              {/* Desktop Layout */}
+              <div className="hidden lg:flex lg:items-start lg:gap-8 lg:px-8 lg:py-6 lg:max-w-[1600px] lg:mx-auto lg:w-full">
                 <Sidebar />
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 pb-12">
                   <Routes>
-                    <Route path="/onboarding" element={<Onboarding />} />
-                    <Route
-                      path="/"
-                      element={
-                        !settings.onboardingCompleted ? (
-                          <Navigate to="/onboarding" replace />
-                        ) : (
-                          <Dashboard />
-                        )
-                      }
-                    />
+                    <Route path="/" element={<Dashboard />} />
                     <Route path="/transactions" element={<Transactions />} />
                     <Route path="/accounts" element={<Accounts />} />
                     <Route path="/budget" element={<Budget />} />
@@ -86,20 +103,11 @@ function App() {
                   </Routes>
                 </div>
               </div>
-              {/* Mobile Layout Container */}
-              <div className="lg:hidden w-full">
+
+              {/* Mobile Layout */}
+              <div className="lg:hidden w-full pb-32">
                 <Routes>
-                  <Route path="/onboarding" element={<Onboarding />} />
-                  <Route
-                    path="/"
-                    element={
-                      !settings.onboardingCompleted ? (
-                        <Navigate to="/onboarding" replace />
-                      ) : (
-                        <Dashboard />
-                      )
-                    }
-                  />
+                  <Route path="/" element={<Dashboard />} />
                   <Route path="/transactions" element={<Transactions />} />
                   <Route path="/accounts" element={<Accounts />} />
                   <Route path="/budget" element={<Budget />} />
@@ -114,7 +122,7 @@ function App() {
                 </Routes>
               </div>
             </div>
-          </main>
+          </div>
 
           <BottomNav />
           <ToastContainer />

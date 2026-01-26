@@ -1,6 +1,36 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import type { AppState, Account, Transaction, Subscription, Goal, Debt, Settings, Trip, ItineraryItem } from './types';
+
+// Custom storage to sync with local file system via Vite dev server
+const apiStorage: StateStorage = {
+  getItem: async (name: string): Promise<string | null> => {
+    try {
+      const response = await fetch('/api/data');
+      if (response.ok) {
+        return await response.text();
+      }
+    } catch (error) {
+      console.warn('Backend storage not available, using localStorage');
+    }
+    return localStorage.getItem(name);
+  },
+  setItem: async (name: string, value: string): Promise<void> => {
+    localStorage.setItem(name, value);
+    try {
+      await fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: value,
+      });
+    } catch (error) {
+      console.error('Failed to sync with backend');
+    }
+  },
+  removeItem: (name: string): void => {
+    localStorage.removeItem(name);
+  },
+};
 
 // Seed data for demo
 const seedAccounts: Account[] = [
@@ -214,6 +244,18 @@ export const useStore = create<AppState>()(
         }));
       },
 
+      users: [
+        { id: 'brian', name: 'Brian', avatar: '/avatars/brian.png', color: '#10b981' },
+        { id: 'nadine', name: 'Nadine', avatar: '/avatars/nadine.png', color: '#8b5cf6' },
+      ],
+      activeUserId: 'brian',
+      setActiveUser: (id) => set({ activeUserId: id }),
+      updateUser: (id, updates) => {
+        set((state) => ({
+          users: state.users.map((u) => (u.id === id ? { ...u, ...updates } : u)),
+        }));
+      },
+
       // Utilities
       getAccountBalance: (accountId) => {
         const account = get().accounts.find((a) => a.id === accountId);
@@ -329,6 +371,7 @@ export const useStore = create<AppState>()(
     {
       name: 'plana-storage',
       version: 1,
+      storage: createJSONStorage(() => apiStorage),
       partialize: (state) => {
         const { toasts, ...rest } = state;
         return rest;

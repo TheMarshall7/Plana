@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import UserSelector from './UserSelector';
 
 export default function Header() {
   return (
@@ -9,9 +10,15 @@ export default function Header() {
         </div>
         <span className="text-lg lg:text-xl font-medium tracking-tight text-white/90">Plana</span>
       </Link>
-      <button className="w-10 h-10 lg:w-12 lg:h-12 rounded-full hover:bg-white/5 flex items-center justify-center transition-colors">
-        <iconify-icon icon="solar:bell-linear" className="text-white/70" width="22"></iconify-icon>
-      </button>
+
+      <div className="flex items-center gap-3">
+        <button className="w-10 h-10 lg:w-12 lg:h-12 rounded-full hover:bg-white/5 flex items-center justify-center transition-colors">
+          <iconify-icon icon="solar:bell-linear" className="text-white/70" width="22"></iconify-icon>
+        </button>
+        <div className="hidden lg:block">
+          <UserSelector />
+        </div>
+      </div>
     </header>
   );
 }
