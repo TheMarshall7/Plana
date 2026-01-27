@@ -1,22 +1,22 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { AppState, Account, Transaction, Subscription, Goal, Debt, Settings, Trip, ItineraryItem } from './types';
 
-// Debounced Supabase sync for mobile-friendly auto-save
+// Background cloud sync - debounced and non-blocking
 let supabaseSyncTimeout: NodeJS.Timeout | null = null;
-let pendingSyncData: { name: string; value: string } | null = null;
+let pendingSyncData: string | null = null;
 
-const syncToSupabase = async (name: string, value: string) => {
+const syncToSupabase = async (stateJson: string) => {
   try {
     // Check if online (mobile-friendly)
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      console.log('Offline - will retry Supabase sync when online');
-      pendingSyncData = { name, value };
+      console.log('📴 Offline - will retry Supabase sync when online');
+      pendingSyncData = stateJson;
       return;
     }
 
-    const state = JSON.parse(value);
-    const { supabaseUrl, supabaseKey } = state.state.settings || {};
+    const state = JSON.parse(stateJson);
+    const { supabaseUrl, supabaseKey } = state.settings || {};
 
     if (supabaseUrl && supabaseKey) {
       const controller = new AbortController();
@@ -42,29 +42,29 @@ const syncToSupabase = async (name: string, value: string) => {
         clearTimeout(timeoutId);
 
         if (response.ok) {
-          console.log('✓ Supabase sync successful');
+          console.log('✅ Supabase sync successful');
           pendingSyncData = null; // Clear pending data on success
         } else {
-          console.warn('Supabase sync failed:', response.status);
-          pendingSyncData = { name, value }; // Store for retry
+          console.warn('⚠️ Supabase sync failed:', response.status);
+          pendingSyncData = stateJson; // Store for retry
         }
       } catch (fetchError) {
         clearTimeout(timeoutId);
         if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-          console.warn('Supabase sync timeout - will retry');
+          console.warn('⏱️ Supabase sync timeout - will retry');
         } else {
-          console.warn('Supabase sync error:', fetchError);
+          console.warn('❌ Supabase sync error:', fetchError);
         }
-        pendingSyncData = { name, value }; // Store for retry
+        pendingSyncData = stateJson; // Store for retry
       }
     }
   } catch (error) {
-    console.warn('Cloud sync failed:', error);
-    pendingSyncData = { name, value }; // Store for retry
+    console.warn('❌ Cloud sync failed:', error);
+    pendingSyncData = stateJson; // Store for retry
   }
 };
 
-const debouncedSupabaseSync = (name: string, value: string) => {
+const debouncedSupabaseSync = (stateJson: string) => {
   // Clear existing timeout
   if (supabaseSyncTimeout) {
     clearTimeout(supabaseSyncTimeout);
@@ -72,7 +72,7 @@ const debouncedSupabaseSync = (name: string, value: string) => {
 
   // Set new timeout (500ms debounce for mobile)
   supabaseSyncTimeout = setTimeout(() => {
-    syncToSupabase(name, value);
+    syncToSupabase(stateJson);
   }, 500);
 };
 
@@ -80,85 +80,72 @@ const debouncedSupabaseSync = (name: string, value: string) => {
 if (typeof window !== 'undefined') {
   window.addEventListener('online', () => {
     if (pendingSyncData) {
-      console.log('Back online - retrying Supabase sync');
-      syncToSupabase(pendingSyncData.name, pendingSyncData.value);
+      console.log('🌐 Back online - retrying Supabase sync');
+      syncToSupabase(pendingSyncData);
     }
   });
 }
 
-// Custom storage to sync with local file system via Vite dev server
-const apiStorage: StateStorage = {
-  getItem: async (name: string): Promise<string | null> => {
-    // 1. Try Supabase Cloud Sync first
-    try {
-      const localData = localStorage.getItem(name);
-      if (localData) {
-        const state = JSON.parse(localData);
-        const { supabaseUrl, supabaseKey } = state.state.settings || {};
+// Load initial data from Supabase on app start
+const loadFromSupabase = async (): Promise<any | null> => {
+  try {
+    const localData = localStorage.getItem('plana-storage');
+    if (!localData) return null;
 
-        if (supabaseUrl && supabaseKey) {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+    const parsed = JSON.parse(localData);
+    const { supabaseUrl, supabaseKey } = parsed.state?.settings || {};
 
-          try {
-            const response = await fetch(`${supabaseUrl}/rest/v1/user_data?select=data&limit=1`, {
-              headers: {
-                'apikey': supabaseKey,
-                'Authorization': `Bearer ${supabaseKey}`
-              },
-              signal: controller.signal
-            });
+    if (supabaseUrl && supabaseKey) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
-            clearTimeout(timeoutId);
+      try {
+        const response = await fetch(`${supabaseUrl}/rest/v1/user_data?select=data&limit=1`, {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`
+          },
+          signal: controller.signal
+        });
 
-            if (response.ok) {
-              const result = await response.json();
-              if (result && result.length > 0) {
-                console.log('✓ Loaded data from Supabase');
-                return JSON.stringify(result[0].data);
-              }
-            }
-          } catch (fetchError) {
-            clearTimeout(timeoutId);
-            console.warn('Supabase fetch failed, using local storage');
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result && result.length > 0) {
+            console.log('✅ Loaded data from Supabase');
+            return result[0].data;
           }
         }
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        console.warn('⚠️ Supabase fetch failed, using local storage');
       }
-    } catch (error) {
-      console.warn('Supabase sync failed, falling back to local storage');
     }
-
-    // 2. Fallback to Local Repo DB
-    try {
-      const response = await fetch('/api/data');
-      if (response.ok) {
-        return await response.text();
-      }
-    } catch (error) {
-      console.warn('Backend storage not available, using localStorage');
-    }
-    return localStorage.getItem(name);
-  },
-  setItem: async (name: string, value: string): Promise<void> => {
-    // CRITICAL: Always update localStorage first (synchronous for mobile)
-    localStorage.setItem(name, value);
-
-    // 1. Sync to Local Repo DB (non-blocking)
-    fetch('/api/data', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: value,
-    }).catch(error => {
-      console.error('Failed to sync with backend:', error);
-    });
-
-    // 2. Debounced Sync to Supabase Cloud (mobile-friendly)
-    debouncedSupabaseSync(name, value);
-  },
-  removeItem: (name: string): void => {
-    localStorage.removeItem(name);
-  },
+  } catch (error) {
+    console.warn('❌ Failed to load from Supabase');
+  }
+  return null;
 };
+
+// Try to load from Supabase on startup
+if (typeof window !== 'undefined') {
+  loadFromSupabase().then(cloudData => {
+    if (cloudData) {
+      // Merge cloud data with local data
+      const localData = localStorage.getItem('plana-storage');
+      if (localData) {
+        const local = JSON.parse(localData);
+        // Cloud data takes precedence
+        localStorage.setItem('plana-storage', JSON.stringify({ ...local, state: cloudData }));
+        // Trigger a re-render by updating the store
+        if (window.location.pathname) {
+          window.location.reload();
+        }
+      }
+    }
+  });
+}
 
 // Seed data for demo
 const seedAccounts: Account[] = [
@@ -511,7 +498,7 @@ export const useStore = create<AppState>()(
     {
       name: 'plana-storage',
       version: 1,
-      storage: createJSONStorage(() => apiStorage),
+      storage: createJSONStorage(() => localStorage), // Synchronous for mobile!
       partialize: (state) => {
         const { toasts, ...rest } = state;
         return rest;
@@ -519,3 +506,14 @@ export const useStore = create<AppState>()(
     }
   )
 );
+
+// Background cloud sync subscription
+if (typeof window !== 'undefined') {
+  useStore.subscribe((state) => {
+    // Get the full state as JSON
+    const stateJson = JSON.stringify(state);
+    // Trigger debounced cloud sync
+    debouncedSupabaseSync(stateJson);
+  });
+}
+
